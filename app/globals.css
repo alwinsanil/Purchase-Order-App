@@ -2,26 +2,76 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
-
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  @apply bg-stone-900;
+}
+h1 {
+  @apply text-3xl font-extrabold;
+}
+
+h2 {
+  @apply text-2xl font-bold;
+}
+input {
+  @apply py-1 px-2 rounded-lg;
+}
+
+select {
+  @apply rounded-lg py-1 px-2;
+}
+
+label {
+  @apply text-lg;
+}
+
+.activeNavItem {
+  @apply flex flex-row items-center bg-gray-200 p-1 pl-2 rounded-l-lg mr-0 pr-10 gap-2 text-lg;
+}
+
+.inactiveNavItem {
+  @apply text-white flex flex-row items-center hover:bg-stone-700 p-1 pl-2 rounded-l-lg mr-0 pr-10 gap-2 text-lg;
+}
+
+.btn-1 {
+  @apply flex items-center max-w-fit justify-center gap-2 text-lg font-bold border-2 border-black py-1 px-2 rounded-lg hover:bg-gray-300;
+}
+
+.btn-green {
+  @apply bg-green-600 text-lg py-1 px-2 rounded-lg flex items-center justify-center gap-1;
+}
+
+.btn-red {
+  @apply bg-red-700 text-lg py-1 px-2 rounded-lg flex items-center justify-center gap-1;
+}
+
+.btn-red-small {
+  @apply bg-red-700 py-1 px-2 rounded-lg flex items-center justify-center gap-1 hover:bg-red-800;
+}
+
+.btn-blue-small {
+  @apply bg-blue-700 py-1 px-2 rounded-lg flex items-center justify-center gap-1 hover:bg-blue-800;
+}
+
+.plusIcon {
+  @apply rounded-xl w-6 h-6;
+}
+
+.projItems {
+  @apply flex flex-col;
+}
+
+table.basic {
+  @apply w-full;
+}
+
+table.basic tr td {
+  @apply border border-gray-300 p-1;
+}
+
+table.basic thead tr td {
+  @apply bg-blue-100 text-center;
+}
+
+table.basic a {
+  @apply bg-blue-900 text-white text-sm p-1 rounded-md hover:bg-blue-800 inline-flex gap-1 m-1;
 }
