@@ -6,7 +6,12 @@ const NewProduct = () => {
   return (
     <div>
         <h2>Add New Project</h2>
-        <ProjectForm />
+        <ProjectForm _id={""} entity={{
+        _id: "",
+        entityCode: 0,
+        entityAbbrev: "",
+        entityName: ""
+      }} abbrev={""} projectName={""} contractNo={""} deliveryAddress={[]} contactPerson={""} />
     </div>
   )
 }

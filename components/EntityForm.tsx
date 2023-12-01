@@ -5,13 +5,33 @@ import { MdCancel } from "react-icons/md";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-const EntityForm = () => {
+interface EntityInterface {
+  _id: string;
+  entityCode: number;
+  entityAbbrev: string;
+  entityName: string;
+  entityTRN: number;
+  entityAddress: {
+    address: string;
+    POBox: string;
+    country: string;
+  };
+}
+
+const EntityForm: React.FC<EntityInterface> = ({
+  _id,
+  entityCode: existingEntityCode,
+  entityAbbrev: existingEntityAbbrev,
+  entityName: existingEntityName,
+  entityTRN: existingEntityTRN,
+  entityAddress: existingEntityAddress,
+}) => {
   const router = useRouter();
-  const [entityCode, setEntityCode] = useState<number | null>(null);
-  const [entityAbbrev, setEntityAbbrev] = useState("");
-  const [entityName, setEntityName] = useState("");
-  const [entityTRN, setEntityTRN] = useState<number | null>(null)
-  const [entityAddress, setEntityAddress] = useState({
+  const [entityCode, setEntityCode] = useState<number | null>(existingEntityCode || null);
+  const [entityAbbrev, setEntityAbbrev] = useState(existingEntityAbbrev || "");
+  const [entityName, setEntityName] = useState(existingEntityName || "");
+  const [entityTRN, setEntityTRN] = useState<number | null>(existingEntityTRN || null)
+  const [entityAddress, setEntityAddress] = useState(existingEntityAddress || {
     address: "",
     POBox: "",
     country: "",
@@ -25,7 +45,11 @@ const EntityForm = () => {
       entityAddress,
       entityTRN,
     };
-    const response = await axios.post("/api/entities", data);
+    if (_id) {
+      await axios.put('/api/entities', {...data, _id})
+    } else {
+      await axios.post("/api/entities", data);
+    }
     router.push("/Entities");
   }
   return (

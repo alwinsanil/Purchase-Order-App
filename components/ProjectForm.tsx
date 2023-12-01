@@ -5,15 +5,49 @@ import { useState, useEffect } from "react";
 import { FaCheck } from "react-icons/fa6";
 import { MdCancel } from "react-icons/md";
 
-const ProjectForm = () => {
+interface ProjectInterface {
+  _id: string;
+  entity: {
+    _id: string;
+    entityCode: number;
+    entityAbbrev: string;
+    entityName: string;
+  };
+  abbrev: string;
+  projectName: string;
+  contractNo: string;
+  deliveryAddress: {
+    address: string;
+    POBox: string;
+    country: string;
+  }[];
+  contactPerson: string;
+}
+
+const ProjectForm: React.FC<ProjectInterface> = ({
+  _id,
+  entity: existingEntity,
+  abbrev: existingAbbrev,
+  projectName: existingProjectName,
+  contractNo: existingContractNo,
+  deliveryAddress: existingDeliveryAddresses,
+  contactPerson: existingContactPerson,
+}) => {
   const router = useRouter();
   const [abbrev, setAbbrev] = useState("");
   const [projectName, setProjectName] = useState("");
   const [contractNo, setContractNo] = useState("");
+  const [purchaseReqCount, setPurchaseReqCount] = useState(0);
   const [deliveryAddress, setDeliveryAddress] = useState([
     { address: "", POBox: "", country: "" },
   ]);
   const [contactPerson, setContactPerson] = useState("");
+  const [entity, setEntity] = useState({
+    _id: "",
+    entityCode: 0,
+    entityAbbrev: "",
+    entityName: "",
+  });
   const [allEntities, setAllEntities] = useState([
     {
       _id: "",
@@ -22,17 +56,27 @@ const ProjectForm = () => {
       entityName: "",
     },
   ]);
-  const [entity, setEntity] = useState({
-    _id: "",
-    entityCode: 0,
-    entityAbbrev: "",
-    entityName: "",
-  });
+  useEffect(() => {
+    setAbbrev(existingAbbrev);
+    setEntity(existingEntity);
+    setProjectName(existingProjectName);
+    setContractNo(existingContractNo);
+    setDeliveryAddress(existingDeliveryAddresses);
+    setContactPerson(existingContactPerson);
+  }, [
+    existingAbbrev,
+    existingContactPerson,
+    existingContractNo,
+    existingDeliveryAddresses,
+    existingEntity,
+    existingProjectName,
+  ]);
   useEffect(() => {
     axios
       .get("/api/entities")
       .then((response) => setAllEntities(response.data));
   }, []);
+
   function handleAddressChange(index: number, newAddress: string) {
     const newDeliveryAddress = [...deliveryAddress];
     newDeliveryAddress[index].address = newAddress;
@@ -70,7 +114,6 @@ const ProjectForm = () => {
   }
   async function saveEntity(e: React.FormEvent) {
     e.preventDefault();
-    console.log(entity);
     if (entity._id === "") {
       alert("Entity Cannot be Empty");
       return;
@@ -87,11 +130,12 @@ const ProjectForm = () => {
       })),
       entity,
     };
-    console.log("POST");
-      const response = await axios.post("/api/projects", data, {
-        headers: { "Content-Type": "application/json" },
-      });
-      router.push("/Projects");
+    if (_id) {
+      await axios.put("/api/projects", { ...data, _id });
+    } else {
+      await axios.post("/api/projects", { ...data, purchaseReqCount });
+    }
+    router.push("/Projects");
   }
 
   return (
@@ -100,7 +144,7 @@ const ProjectForm = () => {
         <div className="projItems">
           <label>Entity Name</label>
           <select
-            value={entity._id}
+            value={entity?._id}
             onChange={(e) => entityUpdate(e.target.value)}
           >
             <option value="">Select Entity</option>

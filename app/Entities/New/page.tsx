@@ -5,7 +5,11 @@ const NewEntity = () => {
   return (
     <div>
       <h2>Add New Entity</h2>
-      <EntityForm />
+      <EntityForm _id={""} entityCode={0} entityAbbrev={""} entityName={""} entityTRN={0} entityAddress={{
+        address: "",
+        POBox: "",
+        country: ""
+      }} />
     </div>
   );
 };

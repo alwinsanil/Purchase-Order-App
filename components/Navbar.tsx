@@ -1,6 +1,6 @@
 'use client'
 import Link from "next/link";
-import { FaHardHat, FaHome, FaShoppingCart, FaUsers } from "react-icons/fa";
+import { FaClipboardList, FaHardHat, FaHome, FaShoppingCart, FaUsers } from "react-icons/fa";
 import { AiOutlineUnorderedList } from "react-icons/ai";
 import { usePathname } from "next/navigation";
 
@@ -27,6 +27,10 @@ const Navbar = () => {
       <Link href={'/Entities'} className={pathname.includes('Entities') ? "activeNavItem" : "inactiveNavItem"}>
         <FaUsers />
         Entities
+      </Link>
+      <Link href={'/PurchaseReq'} className={pathname.includes('PurchaseReq') ? "activeNavItem" : "inactiveNavItem"}>
+        <FaClipboardList />
+        PR
       </Link>
     </div>
   );

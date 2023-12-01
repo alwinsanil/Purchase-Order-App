@@ -8,6 +8,7 @@ const ProjectSchema = new Schema(
     deliveryAddress: [{ type: Object, required: true }],
     contactPerson: { type: String, required: true },
     entity: { type: Object, required: true },
+    purchaseReqCount: { type: Number },
   },
   {
     timestamps: true,
