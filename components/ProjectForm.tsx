@@ -38,6 +38,7 @@ const ProjectForm: React.FC<ProjectInterface> = ({
   const [projectName, setProjectName] = useState("");
   const [contractNo, setContractNo] = useState("");
   const [purchaseReqCount, setPurchaseReqCount] = useState(0);
+  const [orderCount, setOrderCount] = useState(0);
   const [deliveryAddress, setDeliveryAddress] = useState([
     { address: "", POBox: "", country: "" },
   ]);
@@ -112,7 +113,7 @@ const ProjectForm: React.FC<ProjectInterface> = ({
       setEntity(propEntity[0]);
     }
   }
-  async function saveEntity(e: React.FormEvent) {
+  async function saveProject(e: React.FormEvent) {
     e.preventDefault();
     if (entity._id === "") {
       alert("Entity Cannot be Empty");
@@ -133,14 +134,14 @@ const ProjectForm: React.FC<ProjectInterface> = ({
     if (_id) {
       await axios.put("/api/projects", { ...data, _id });
     } else {
-      await axios.post("/api/projects", { ...data, purchaseReqCount });
+      await axios.post("/api/projects", { ...data, purchaseReqCount, orderCount });
     }
     router.push("/Projects");
   }
 
   return (
     <div>
-      <form onSubmit={saveEntity} className="flex flex-col gap-3 mt-3">
+      <form onSubmit={saveProject} className="flex flex-col gap-3 mt-3">
         <div className="projItems">
           <label>Entity Name</label>
           <select

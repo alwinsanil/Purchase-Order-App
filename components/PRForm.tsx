@@ -58,7 +58,9 @@ const PRForm: React.FC<PRInterface> = ({
       setItemList(existingItemList);
       setProject(existingProject);
       setPurchaseReqCode(existingPrchaseReqCode);
-      setEditMode(true);
+      if (existingPrchaseReqCode !== "") {
+        setEditMode(true);
+      }
     }
   }, [existingItemList, existingProject, existingPrchaseReqCode]);
   useEffect(() => {
@@ -223,6 +225,7 @@ const PRForm: React.FC<PRInterface> = ({
         _id: project._id,
       });
     }
+    setEditMode(false);
     router.push("/PurchaseReq");
   }
   return (

@@ -3,10 +3,12 @@ import Link from "next/link";
 import { AiFillPlusSquare } from "react-icons/ai";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { IoIosWarning } from "react-icons/io";
+import { IoIosWarning, IoMdEye } from "react-icons/io";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import "reactjs-popup/dist/index.css";
 import Popup from "reactjs-popup";
+import { MdViewCompact } from "react-icons/md";
+import { useRouter } from "next/navigation";
 
 interface itemInterface {
   fCodeAssembly: string;
@@ -35,6 +37,7 @@ interface PRInterface {
 }
 
 const PurchaseReq = () => {
+  const router = useRouter();
   const [purchaseReqs, setPurchaseReqs] = useState<PRInterface[]>([]);
   const [selectedPRs, setSelectedPRs] = useState<PRInterface[]>([]);
   const [deletedId, setDeletedId] = useState("");
@@ -65,6 +68,7 @@ const PurchaseReq = () => {
     axios.put("/api/projects", { purchaseReqCount: count, _id: projectid });
     axios.delete("/api/pr", { data: { _id: _id } }).then((response) => {
       setDeletedId(response.data);
+      setSelectedPRs(selectedPRs.filter((pr) => pr._id !== _id));
     });
     return;
   }
@@ -79,7 +83,6 @@ const PurchaseReq = () => {
           return e.project._id === propProject[0]._id;
         })
       );
-      console.log(selectedPRs);
     } else {
       setProject({ _id: "", projectName: "", purchaseReqCount: 0 });
     }
@@ -92,7 +95,7 @@ const PurchaseReq = () => {
         <AiFillPlusSquare className="plusIcon" />
         Add New Purchase Request
       </Link>
-      <div className="projItems">
+      <div className="projItems mt-3">
         <label>Project Name</label>
         <select value={project?._id} onChange={(e) => updatePR(e.target.value)}>
           <option value="">Select Project</option>
@@ -121,12 +124,12 @@ const PurchaseReq = () => {
                 <td>{p.purchaseReqCode}</td>
                 <td>{p.project.projectName}</td>
                 <td>{p.itemList.length}</td>
-                <td>
+                <td className="max-w-fit text-sm">
                   <Link
                     href={"PurchaseReq/View/" + p._id}
-                    className="btn-blue-small"
+                    className="flex justify-center items-center gap-1 bg-gray-200 p-2 rounded-md w-24 hover:bg-gray-300"
                   >
-                    <FaEdit />
+                    <IoMdEye size="1.3em" />
                     View
                   </Link>
                 </td>
@@ -176,6 +179,7 @@ const PurchaseReq = () => {
                                   p.purchaseReqCode,
                                   p.project._id
                                 );
+                                router.push("/PurchaseReq");
                                 close();
                               }}
                             >

@@ -9,6 +9,7 @@ const ProjectSchema = new Schema(
     contactPerson: { type: String, required: true },
     entity: { type: Object, required: true },
     purchaseReqCount: { type: Number },
+    orderCount: { type: Number },
   },
   {
     timestamps: true,

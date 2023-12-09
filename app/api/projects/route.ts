@@ -13,6 +13,7 @@ export async function POST(req: NextApiRequest) {
     contactPerson,
     entity,
     purchaseReqCount,
+    orderCount,
   } = await (req as any).json();
   const ProjectDoc = await Project.create({
     abbrev,
@@ -21,7 +22,8 @@ export async function POST(req: NextApiRequest) {
     deliveryAddress,
     contactPerson,
     entity,
-    purchaseReqCount
+    purchaseReqCount,
+    orderCount,
   });
   return NextResponse.json(ProjectDoc);
 }
@@ -37,22 +39,37 @@ export async function PUT(req: NextApiRequest) {
     contactPerson,
     entity,
     purchaseReqCount,
+    orderCount,
   } = await (req as any).json();
   const ProjectDoc = await Project.updateOne(
     { _id },
-    { abbrev, projectName, contractNo, deliveryAddress, contactPerson, entity, purchaseReqCount }
+    {
+      abbrev,
+      projectName,
+      contractNo,
+      deliveryAddress,
+      contactPerson,
+      entity,
+      purchaseReqCount,
+      orderCount,
+    }
   );
   return NextResponse.json(ProjectDoc);
 }
 
 export async function GET(req: NextApiRequest) {
   await mongooseConnect();
-  let id = null;
-  if (req.url?.includes("=")) {
-    id = req.url?.split("=").pop();
-  }
+  // @ts-ignore
+  const entity = req.nextUrl.searchParams.get("entity") as string;
+  // @ts-ignore
+  const id = req.nextUrl.searchParams.get("id") as string;
   if (id) {
     return NextResponse.json(await Project.findById(id));
+  }
+  if (entity) {
+    return NextResponse.json(
+      await Project.find({ "entity.entityName": entity })
+    );
   }
   return NextResponse.json(await Project.find());
 }

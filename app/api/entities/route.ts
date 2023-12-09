@@ -36,10 +36,8 @@ export async function PUT(req: NextApiRequest) {
 
 export async function GET(req: NextApiRequest) {
   await mongooseConnect();
-  let id = null;
-  if (req.url?.includes("=")) {
-    id = req.url?.split("=").pop();
-  }
+  // @ts-ignore
+  const id = req.nextUrl.searchParams.get("id") as string;
   if (id) {
     return NextResponse.json(await Entity.findById(id));
   }
