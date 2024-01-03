@@ -12,6 +12,10 @@ h1 {
 h2 {
   @apply text-2xl font-bold;
 }
+
+h3 {
+  @apply text-xl font-bold;
+}
 input {
   @apply py-1 px-2 rounded-lg;
 }

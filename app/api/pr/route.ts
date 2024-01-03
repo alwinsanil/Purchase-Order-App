@@ -27,9 +27,16 @@ export async function PUT(req: NextApiRequest) {
 export async function GET(req: NextApiRequest) {
   await mongooseConnect();
   // @ts-ignore
+  const project = req.nextUrl.searchParams.get("eproject") as string;
+  // @ts-ignore
   const id = req.nextUrl.searchParams.get("id") as string;
   if (id) {
     return NextResponse.json(await PurchaseReq.findById(id));
+  }
+  if (project) {
+    return NextResponse.json(
+      await PurchaseReq.find({ "project.projectName": project })
+    );
   }
   return NextResponse.json(await PurchaseReq.find());
 }
