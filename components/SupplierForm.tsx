@@ -5,7 +5,7 @@ import { MdCancel } from "react-icons/md";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-interface SupplierInterface {
+export interface SupplierInterface {
   _id: string;
   supplierCode: string;
   supplierName: string;

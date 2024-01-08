@@ -5,9 +5,104 @@ import { useEffect, useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import Select from "react-select";
+import GeneratePDF from "./GeneratePDF";
+import { FaFilePdf } from "react-icons/fa6";
 
-const OrderForm = () => {
+export interface itemInterface {
+  fCodeAssembly: string;
+  totalAssembledQty: string;
+  fCodeAssemblyPart: string;
+  description: string;
+  material: string;
+  finish: string;
+  remarks: string;
+  alloy: string;
+  totalQty: number;
+  width: number;
+  thickness: number;
+  length: number;
+  volume: number;
+  weight: number;
+  totalKG: number;
+  totalTons: number;
+  unitPrice: number;
+  totalCost: number;
+}
+
+interface OrderInterface {
+  _id: string;
+  purchaseOrderNo: string;
+  entity: {
+    _id: string;
+    entityCode: number;
+    entityAbbrev: string;
+    entityName: string;
+    entityTRN: number;
+    entityAddress: {
+      address: string;
+      POBox: string;
+      country: string;
+    };
+  };
+  project: {
+    _id: string;
+    entity: {
+      _id: string;
+      entityCode: number;
+      entityAbbrev: string;
+      entityName: string;
+    };
+    abbrev: string;
+    projectName: string;
+    contractNo: string;
+    deliveryAddress: {
+      address: string;
+      POBox: string;
+      country: string;
+    }[];
+    contactPerson: string;
+    orderCount: number;
+    purchaseReqCount: number;
+  };
+  supplier: {
+    _id: string;
+    supplierCode: string;
+    supplierName: string;
+    supplierTRN: number;
+    supplierAddress: {
+      address: string;
+      POBox: string;
+      country: string;
+    };
+    contactName: string;
+    contactNo: string;
+    email: string;
+    paymentTerm: string;
+  };
+  purchaseReq: {
+    _id: string;
+    itemList: itemInterface[];
+    project: { _id: string; projectName: string; purchaseReqCount: number };
+    purchaseReqCode: string;
+  };
+  deliveryAddress: { address: string; POBox: string; country: string };
+  orderDate: Date;
+  deliveryDate: Date | undefined;
+}
+
+const OrderForm: React.FC<OrderInterface> = ({
+  _id,
+  purchaseOrderNo: existingPurchaseOrderNo,
+  entity: existingEntity,
+  project: existingProject,
+  supplier: existingSupplier,
+  purchaseReq: existingPurchaseReq,
+  deliveryAddress: existingDeliveryAddress,
+  orderDate: existingOrderDate,
+  deliveryDate: existingDeliveryDate,
+}) => {
   const router = useRouter();
+
   //styling for react-select
   const customStyles = {
     control: (provided: any) => ({
@@ -31,9 +126,11 @@ const OrderForm = () => {
       color: state.isSelected ? "#ffffff" : "#1f2937",
     }),
   };
+
   //use states
   const [entity, setEntity] = useState({
     _id: "",
+    entityCode: 0,
     entityName: "",
     entityTRN: 0,
     entityAbbrev: "",
@@ -47,6 +144,7 @@ const OrderForm = () => {
     {
       _id: "",
       entityName: "",
+      entityCode: 0,
       entityTRN: 0,
       entityAbbrev: "",
       entityAddress: {
@@ -59,9 +157,15 @@ const OrderForm = () => {
   const [project, setProject] = useState({
     _id: "",
     projectName: "",
+    entity: {
+      _id: "",
+      entityName: "",
+      entityCode: 0,
+      entityAbbrev: "",
+    },
     abbrev: "",
     contactPerson: "",
-    contractNo: 0,
+    contractNo: "",
     deliveryAddress: [
       {
         address: "",
@@ -76,9 +180,15 @@ const OrderForm = () => {
     {
       _id: "",
       projectName: "",
+      entity: {
+        _id: "",
+        entityName: "",
+        entityCode: 0,
+        entityAbbrev: "",
+      },
       abbrev: "",
       contactPerson: "",
-      contractNo: 0,
+      contractNo: "",
       deliveryAddress: [
         {
           address: "",
@@ -192,8 +302,31 @@ const OrderForm = () => {
     POBox: "",
     country: "",
   });
+  const [orderDate, setorderDate] = useState<Date | undefined>(new Date());
+  const [deliveryDate, setDeliveryDate] = useState<Date | undefined>(
+    new Date()
+  );
 
   //useEffects
+  useEffect(() => {
+    setPurchaseOrderNo(existingPurchaseOrderNo);
+    setEntity(existingEntity);
+    setProject(existingProject);
+    setSupplier(existingSupplier);
+    setPurchaseReq(existingPurchaseReq);
+    setDeliveryAddress(existingDeliveryAddress);
+    setDeliveryDate(existingDeliveryDate);
+    setorderDate(existingOrderDate);
+  }, [
+    existingDeliveryAddress,
+    existingDeliveryDate,
+    existingEntity,
+    existingOrderDate,
+    existingProject,
+    existingPurchaseOrderNo,
+    existingPurchaseReq,
+    existingSupplier,
+  ]);
   useEffect(() => {
     axios.get("/api/entities").then((response) => {
       setAllEntities(response.data);
@@ -203,7 +336,7 @@ const OrderForm = () => {
     });
   }, []);
   useEffect(() => {
-    const searchEntity = entity.entityName;
+    const searchEntity = entity?.entityName;
     if (searchEntity !== "") {
       axios.get("/api/projects?entity=" + searchEntity).then((response) => {
         setAllProjects(response.data);
@@ -211,7 +344,7 @@ const OrderForm = () => {
     }
   }, [entity]);
   useEffect(() => {
-    const searchProject = project.projectName;
+    const searchProject = project?.projectName;
     if (searchProject !== "") {
       axios.get("/api/pr?project=").then((response) => {
         setAllPurchaseReqs(response.data);
@@ -219,6 +352,7 @@ const OrderForm = () => {
     }
   }, [project]);
 
+  //Functions
   function updateEntity(value: string | undefined) {
     if (value !== undefined) {
       const propEntity = allEntities.filter((en) => {
@@ -230,6 +364,7 @@ const OrderForm = () => {
       setEntity({
         _id: "",
         entityName: "",
+        entityCode: 0,
         entityTRN: 0,
         entityAbbrev: "",
         entityAddress: { address: "", POBox: "", country: "" },
@@ -242,7 +377,7 @@ const OrderForm = () => {
         return en._id === value;
       });
       setProject(propProject[0]);
-      const tempOrderCount = String(project.orderCount + 1);
+      const tempOrderCount = String(propProject[0].orderCount + 1);
       const pOrderNo =
         entity.entityAbbrev +
         "/" +
@@ -255,9 +390,15 @@ const OrderForm = () => {
       setProject({
         _id: "",
         projectName: "",
+        entity: {
+          _id: "",
+          entityName: "",
+          entityCode: 0,
+          entityAbbrev: "",
+        },
         abbrev: "",
         contactPerson: "",
-        contractNo: 0,
+        contractNo: "",
         deliveryAddress: [
           {
             address: "",
@@ -295,7 +436,7 @@ const OrderForm = () => {
     }
   }
   function updateDeliveryAddress(projectId: string, value: string | undefined) {
-    if (value === "Delivery location to be Declared") {
+    if (value === "Delivery location to be declared") {
       setDeliveryAddress({ address: value, POBox: "", country: "" });
     } else if (value !== undefined) {
       const selProject = allProjects.find((e) => e._id === projectId);
@@ -368,21 +509,29 @@ const OrderForm = () => {
       return;
     }
     const data = {
-      //   itemList,
-      //   project,
-      //   purchaseReqCode,
+      purchaseOrderNo,
+      entity,
+      project,
+      supplier,
+      purchaseReq,
+      deliveryAddress,
+      orderDate,
+      deliveryDate,
     };
 
-    // if (_id) {
-    //   await axios.put("/api/pr", { ...data, _id });
-    // } else {
-    //   await axios.post("/api/pr", data);
-    //   await axios.put("/api/projects", {
-    //     purchaseReqCount: PRCount,
-    //     _id: project._id,
-    //   });
-    // }
-    router.push("/PurchaseReq");
+    const count = Number(project.orderCount) + 1;
+    console.log(count);
+
+    if (_id) {
+      await axios.put("/api/pr", { ...data, _id });
+    } else {
+      await axios.post("/api/orders", data);
+      await axios.put("/api/projects", {
+        orderCount: count,
+        _id: project._id,
+      });
+    }
+    router.push("/Orders");
   }
 
   return (
@@ -424,7 +573,7 @@ const OrderForm = () => {
             styles={customStyles}
           />
         </div>
-        {project._id && (
+        {project?._id && (
           <div className="projItems">
             <h2>Purchase Order: {purchaseOrderNo}</h2>
           </div>
@@ -446,7 +595,7 @@ const OrderForm = () => {
             styles={customStyles}
           />
         </div>
-        {supplier._id && project._id && (
+        {supplier?._id && project._id && (
           <>
             <div className="mb-4 mt-4">
               <label>Entity Details</label>
@@ -545,7 +694,9 @@ const OrderForm = () => {
                   <Select
                     isSearchable
                     value={
-                      project && project._id
+                      deliveryAddress?.address
+                        ? deliveryAddress
+                        : project && project._id
                         ? project.deliveryAddress.find(
                             (obj) => obj.address === project._id
                           )
@@ -561,7 +712,7 @@ const OrderForm = () => {
                     options={[
                       ...project.deliveryAddress,
                       {
-                        address: "Delivery location to be Declared",
+                        address: "Delivery location to be declared",
                         POBox: "",
                         country: "",
                       },
@@ -596,11 +747,12 @@ const OrderForm = () => {
                 <div>
                   <h3 className=" font-normal">
                     <strong>Order Date: </strong>
-                    {new Date().toLocaleDateString("en-GB", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
+                    {orderDate &&
+                      new Date(orderDate).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
                   </h3>
                 </div>
                 <div>
@@ -610,6 +762,14 @@ const OrderForm = () => {
                       type="date"
                       min={new Date().toISOString().split("T")[0]}
                       className=""
+                      value={
+                        deliveryDate
+                          ? new Date(deliveryDate).toISOString().split("T")[0]
+                          : undefined
+                      }
+                      onChange={(e) =>
+                        setDeliveryDate(new Date(e.target.value))
+                      }
                       required
                     />
                   </h3>
@@ -630,7 +790,9 @@ const OrderForm = () => {
                 onChange={(selectedOption) =>
                   updatePurchaseReq(selectedOption?._id)
                 }
-                options={allPurchaseReqs}
+                options={allPurchaseReqs.filter((en) => {
+                  return en.project._id === project._id;
+                })}
                 getOptionLabel={(option) => option.purchaseReqCode}
                 getOptionValue={(option) => option._id}
                 styles={customStyles}
@@ -683,6 +845,25 @@ const OrderForm = () => {
           <button type="submit" className="btn-green">
             <FaCheck />
             Save
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              GeneratePDF(
+                purchaseOrderNo,
+                entity,
+                project,
+                supplier,
+                purchaseReq,
+                deliveryAddress,
+                orderDate,
+                deliveryDate
+              )
+            }
+            className="btn-yellow"
+          >
+            <FaFilePdf />
+            Save & Generate PDF
           </button>
           <Link href="/Orders" type="button" className="btn-red">
             <MdCancel />

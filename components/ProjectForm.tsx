@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { FaCheck } from "react-icons/fa6";
 import { MdCancel } from "react-icons/md";
 
-interface ProjectInterface {
+export interface ProjectInterface {
   _id: string;
   entity: {
     _id: string;
@@ -37,8 +37,8 @@ const ProjectForm: React.FC<ProjectInterface> = ({
   const [abbrev, setAbbrev] = useState("");
   const [projectName, setProjectName] = useState("");
   const [contractNo, setContractNo] = useState("");
-  const [purchaseReqCount, setPurchaseReqCount] = useState(0);
-  const [orderCount, setOrderCount] = useState(0);
+  const purchaseReqCount = 0;
+  const orderCount = 0;
   const [deliveryAddress, setDeliveryAddress] = useState([
     { address: "", POBox: "", country: "" },
   ]);
@@ -134,7 +134,11 @@ const ProjectForm: React.FC<ProjectInterface> = ({
     if (_id) {
       await axios.put("/api/projects", { ...data, _id });
     } else {
-      await axios.post("/api/projects", { ...data, purchaseReqCount, orderCount });
+      await axios.post("/api/projects", {
+        ...data,
+        purchaseReqCount,
+        orderCount,
+      });
     }
     router.push("/Projects");
   }

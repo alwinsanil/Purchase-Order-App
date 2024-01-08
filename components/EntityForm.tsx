@@ -5,7 +5,7 @@ import { MdCancel } from "react-icons/md";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-interface EntityInterface {
+export interface EntityInterface {
   _id: string;
   entityCode: number;
   entityAbbrev: string;

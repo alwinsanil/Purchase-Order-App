@@ -7,7 +7,6 @@ import { IoIosWarning, IoMdEye } from "react-icons/io";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import "reactjs-popup/dist/index.css";
 import Popup from "reactjs-popup";
-import { MdViewCompact } from "react-icons/md";
 import { useRouter } from "next/navigation";
 
 interface itemInterface {
