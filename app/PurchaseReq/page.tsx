@@ -8,6 +8,7 @@ import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import "reactjs-popup/dist/index.css";
 import Popup from "reactjs-popup";
 import { useRouter } from "next/navigation";
+import Select from "react-select";
 
 interface itemInterface {
   fCodeAssembly: string;
@@ -36,6 +37,29 @@ interface PRInterface {
 }
 
 const PurchaseReq = () => {
+  //styling for react-select
+  const customStyles = {
+    control: (provided: any) => ({
+      ...provided,
+      fontSize: "1rem",
+      backgroundColor: "white",
+      borderColor: "#d1d5db",
+      borderRadius: "0.5rem",
+      boxShadow: "none",
+      "&:hover": {
+        borderColor: "#9ca3af",
+      },
+    }),
+    option: (provided: any, state: { isSelected: any; isFocused: any }) => ({
+      ...provided,
+      backgroundColor: state.isSelected
+        ? "#1C1917"
+        : state.isFocused
+        ? "#e5e7eb"
+        : null,
+      color: state.isSelected ? "#ffffff" : "#1f2937",
+    }),
+  };
   const router = useRouter();
   const [purchaseReqs, setPurchaseReqs] = useState<PRInterface[]>([]);
   const [selectedPRs, setSelectedPRs] = useState<PRInterface[]>([]);
@@ -71,7 +95,7 @@ const PurchaseReq = () => {
     });
     return;
   }
-  function updatePR(value: string) {
+  function updatePR(value: string | undefined) {
     if (value !== "") {
       const propProject = allProjects.filter((en) => {
         return en._id === value;
@@ -96,15 +120,20 @@ const PurchaseReq = () => {
       </Link>
       <div className="projItems mt-3">
         <label>Project Name</label>
-        <select value={project?._id} onChange={(e) => updatePR(e.target.value)}>
-          <option value="">Select Project</option>
-          {!!allProjects?.length &&
-            allProjects.map((project) => (
-              <option key={project._id} value={project._id}>
-                {project.projectName}
-              </option>
-            ))}
-        </select>
+        <Select
+          isSearchable
+          value={
+            project && project._id
+              ? allProjects.find((obj) => obj._id === project._id)
+              : null
+          }
+          placeholder="Select Project"
+          onChange={(selectedOption) => updatePR(selectedOption?._id)}
+          options={allProjects}
+          getOptionLabel={(option) => option.projectName}
+          getOptionValue={(option) => option._id}
+          styles={customStyles}
+        />
       </div>
       <table className="primary mt-3">
         <thead>

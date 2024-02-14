@@ -4,19 +4,7 @@ import { FaCheck } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-
-export interface EntityInterface {
-  _id: string;
-  entityCode: number;
-  entityAbbrev: string;
-  entityName: string;
-  entityTRN: number;
-  entityAddress: {
-    address: string;
-    POBox: string;
-    country: string;
-  };
-}
+import { EntityInterface } from "./Interfaces";
 
 const EntityForm: React.FC<EntityInterface> = ({
   _id,

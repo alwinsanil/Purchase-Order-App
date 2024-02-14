@@ -7,8 +7,9 @@ import { MdCancel } from "react-icons/md";
 import Select from "react-select";
 import GeneratePDF from "./GeneratePDF";
 import { FaFilePdf } from "react-icons/fa6";
+import { EntityInterface, ProjectInterface, SupplierInterface } from "./Interfaces";
 
-export interface itemInterface {
+interface itemInterface {
   fCodeAssembly: string;
   totalAssembledQty: string;
   fCodeAssemblyPart: string;
@@ -32,53 +33,9 @@ export interface itemInterface {
 interface OrderInterface {
   _id: string;
   purchaseOrderNo: string;
-  entity: {
-    _id: string;
-    entityCode: number;
-    entityAbbrev: string;
-    entityName: string;
-    entityTRN: number;
-    entityAddress: {
-      address: string;
-      POBox: string;
-      country: string;
-    };
-  };
-  project: {
-    _id: string;
-    entity: {
-      _id: string;
-      entityCode: number;
-      entityAbbrev: string;
-      entityName: string;
-    };
-    abbrev: string;
-    projectName: string;
-    contractNo: string;
-    deliveryAddress: {
-      address: string;
-      POBox: string;
-      country: string;
-    }[];
-    contactPerson: string;
-    orderCount: number;
-    purchaseReqCount: number;
-  };
-  supplier: {
-    _id: string;
-    supplierCode: string;
-    supplierName: string;
-    supplierTRN: number;
-    supplierAddress: {
-      address: string;
-      POBox: string;
-      country: string;
-    };
-    contactName: string;
-    contactNo: string;
-    email: string;
-    paymentTerm: string;
-  };
+  entity: EntityInterface;
+  project: ProjectInterface;
+  supplier: SupplierInterface;
   purchaseReq: {
     _id: string;
     itemList: itemInterface[];
@@ -214,6 +171,13 @@ const OrderForm: React.FC<OrderInterface> = ({
     contactNo: "",
     email: "",
     paymentTerm: "",
+    bankDetails: {
+      beneficiary: "",
+      bank: "",
+      swiftCode: "",
+      accountNumber: "",
+      iban: "",
+    },
   });
   const [allSuppliers, setAllSuppliers] = useState([
     {
@@ -230,6 +194,13 @@ const OrderForm: React.FC<OrderInterface> = ({
       contactNo: "",
       email: "",
       paymentTerm: "",
+      bankDetails: {
+        beneficiary: "",
+        bank: "",
+        swiftCode: "",
+        accountNumber: "",
+        iban: "",
+      },
     },
   ]);
   const [allPurchaseReqs, setAllPurchaseReqs] = useState([
@@ -386,6 +357,7 @@ const OrderForm: React.FC<OrderInterface> = ({
         "/" +
         new Date().getFullYear();
       setPurchaseOrderNo(pOrderNo);
+      updateDeliveryAddress(undefined, undefined);
     } else {
       setProject({
         _id: "",
@@ -410,6 +382,7 @@ const OrderForm: React.FC<OrderInterface> = ({
         purchaseReqCount: 0,
       });
     }
+    updateDeliveryAddress(undefined, undefined);
   }
   function updateSupplier(value: string | undefined) {
     if (value !== undefined) {
@@ -432,10 +405,20 @@ const OrderForm: React.FC<OrderInterface> = ({
         contactNo: "",
         email: "",
         paymentTerm: "",
+        bankDetails: {
+          beneficiary: "",
+          bank: "",
+          swiftCode: "",
+          accountNumber: "",
+          iban: "",
+        },
       });
     }
   }
-  function updateDeliveryAddress(projectId: string, value: string | undefined) {
+  function updateDeliveryAddress(
+    projectId: string | undefined,
+    value: string | undefined
+  ) {
     if (value === "Delivery location to be declared") {
       setDeliveryAddress({ address: value, POBox: "", country: "" });
     } else if (value !== undefined) {
@@ -595,20 +578,55 @@ const OrderForm: React.FC<OrderInterface> = ({
             styles={customStyles}
           />
         </div>
+        <div className="projItems">
+          <label>Delivery Address</label>
+          <Select
+            key={project?._id}
+            isSearchable
+            value={
+              deliveryAddress?.address !== ""
+                ? deliveryAddress
+                : project && project._id
+                ? project.deliveryAddress.find(
+                    (obj) => obj.address === project._id
+                  )
+                : null
+            }
+            placeholder="Select Address"
+            onChange={(selectedOption) =>
+              updateDeliveryAddress(project._id, selectedOption?.address)
+            }
+            options={[
+              ...(Array.isArray(project?.deliveryAddress)
+                ? project.deliveryAddress
+                : []),
+              {
+                address: "Delivery location to be declared",
+                POBox: "",
+                country: "",
+              },
+            ]}
+            getOptionLabel={(option) => option.address}
+            getOptionValue={(option) => option.address}
+            styles={customStyles}
+            required
+          />
+        </div>
         {supplier?._id && project._id && (
           <>
             <div className="mb-4 mt-4">
               <label>Entity Details</label>
-              <div className="grid grid-cols-2 w-full">
+              <div className="flex flex-col w-full">
                 <div className="max-w-md flex gap-1">
                   <p className="pt-2">
                     <strong>From: </strong>
                   </p>
-                  <div className="bg-white border-2 shadow-sm rounded-lg p-2 flex-grow">
-                    <p>{entity.entityName}</p>
-                    <p>{entity.entityAddress.address}</p>
-                    <p>{entity.entityAddress.country}</p>
-                    <p>P.O. Box: {entity.entityAddress.POBox}</p>
+                  <div className="p-2">
+                    <p>
+                      {entity.entityName}, {entity.entityAddress.address},{" "}
+                      {entity.entityAddress.country}, P.O. Box:{" "}
+                      {entity.entityAddress.POBox}
+                    </p>
                   </div>
                 </div>
                 <div className="max-w-md flex gap-1">
@@ -621,55 +639,52 @@ const OrderForm: React.FC<OrderInterface> = ({
                 </div>
               </div>
             </div>
-            {/* <div className="flex text-center items-center justify-center border-b-2 border-black my-4 max-w-md">
-            </div> */}
             <div className="mb-4">
               <label>Supplier Details</label>
-              <div className="grid grid-cols-3 w-full gap-4">
+              <div className="flex flex-col w-full">
                 <div className="max-w-md flex gap-1">
                   <p className="pt-2">
                     <strong>To: </strong>
                   </p>
-                  <div className="bg-white border-2 shadow-sm rounded-lg p-2 flex-grow">
-                    <p>{supplier.supplierName}</p>
-                    <p>{supplier.supplierAddress.address}</p>
-                    <p>{supplier.supplierAddress.country}</p>
-                    <p>P.O. Box: {supplier.supplierAddress.POBox}</p>
+                  <div className="p-2">
+                    <p>
+                      {supplier.supplierName},{" "}
+                      {supplier.supplierAddress.address},{" "}
+                      {supplier.supplierAddress.country}, P.O. Box:{" "}
+                      {supplier.supplierAddress.POBox}
+                    </p>
                   </div>
                 </div>
-                <div className="flex flex-col items-start justify-center ml-10">
-                  <div className="max-w-md flex gap-1 mb-1">
-                    <p className="">
-                      <strong>Contact: </strong>
-                    </p>
-                    <p>{supplier.contactName}</p>
-                  </div>
-                  <div className="max-w-md flex gap-1 mb-1">
-                    <p className="">
-                      <strong>Number: </strong>
-                    </p>
-                    <p>{supplier.contactNo}</p>
-                  </div>
-                  <div className="max-w-md flex gap-1">
-                    <p className="">
-                      <strong>Email: </strong>
-                    </p>
-                    <p>{supplier.email}</p>
-                  </div>
+
+                <div className="max-w-md flex gap-1 mb-1">
+                  <p className="">
+                    <strong>Contact: </strong>
+                  </p>
+                  <p>{supplier.contactName}</p>
                 </div>
-                <div className="flex flex-col items-start justify-center">
-                  <div className="max-w-md flex gap-1">
-                    <p className="">
-                      <strong>TRN: </strong>
-                    </p>
-                    <p>{supplier.supplierTRN}</p>
-                  </div>
-                  <div className="max-w-md flex gap-1">
-                    <p className="">
-                      <strong>Payment Term: </strong>
-                    </p>
-                    <p>{supplier.paymentTerm}</p>
-                  </div>
+                <div className="max-w-md flex gap-1 mb-1">
+                  <p className="">
+                    <strong>Number: </strong>
+                  </p>
+                  <p>{supplier.contactNo}</p>
+                </div>
+                <div className="max-w-md flex gap-1 mb-1">
+                  <p className="">
+                    <strong>Email: </strong>
+                  </p>
+                  <p>{supplier.email}</p>
+                </div>
+                <div className="max-w-md flex gap-1 mb-1">
+                  <p className="">
+                    <strong>TRN: </strong>
+                  </p>
+                  <p>{supplier.supplierTRN}</p>
+                </div>
+                <div className="max-w-md flex gap-1 mb-1">
+                  <p className="">
+                    <strong>Payment Term: </strong>
+                  </p>
+                  <p>{supplier.paymentTerm}</p>
                 </div>
               </div>
             </div>
@@ -690,53 +705,25 @@ const OrderForm: React.FC<OrderInterface> = ({
                     {project.contactPerson}
                   </p>
                 </div>
-                <div className=" justify-center w-64">
-                  <Select
-                    isSearchable
-                    value={
-                      deliveryAddress?.address
-                        ? deliveryAddress
-                        : project && project._id
-                        ? project.deliveryAddress.find(
-                            (obj) => obj.address === project._id
-                          )
-                        : null
-                    }
-                    placeholder="Select Address"
-                    onChange={(selectedOption) =>
-                      updateDeliveryAddress(
-                        project._id,
-                        selectedOption?.address
-                      )
-                    }
-                    options={[
-                      ...project.deliveryAddress,
-                      {
-                        address: "Delivery location to be declared",
-                        POBox: "",
-                        country: "",
-                      },
-                    ]}
-                    getOptionLabel={(option) => option.address}
-                    getOptionValue={(option) => option.address}
-                    styles={customStyles}
-                    required
-                  />
-                </div>
                 {deliveryAddress.address !== "" && (
-                  <div>
+                  <div className="mt-2">
                     <p className="mb-1">
                       <strong>Delivery Address: </strong>
                       {deliveryAddress.address}
                     </p>
-                    <p className="mb-1">
-                      <strong>Destination: </strong>
-                      {deliveryAddress.country}
-                    </p>
-                    <p className="">
-                      <strong>P.O. Box: </strong>
-                      {deliveryAddress.POBox}
-                    </p>
+                    {deliveryAddress.address !==
+                      "Delivery location to be declared" && (
+                      <>
+                        <p className="mb-1">
+                          <strong>Destination: </strong>
+                          {deliveryAddress.country}
+                        </p>
+                        <p className="">
+                          <strong>P.O. Box: </strong>
+                          {deliveryAddress.POBox}
+                        </p>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
@@ -822,7 +809,7 @@ const OrderForm: React.FC<OrderInterface> = ({
                         <td>
                           <input
                             type="Number"
-                            className="number-input w-16"
+                            className="number-input w-16 border-2"
                             value={item.unitPrice === 0 ? null : item.unitPrice}
                             onChange={(e) => {
                               const up = e.target.value
@@ -832,7 +819,13 @@ const OrderForm: React.FC<OrderInterface> = ({
                             }}
                           />
                         </td>
-                        <td>{item.totalCost === 0 ? null : item.totalCost}</td>
+                        <td>
+                          {item.totalCost
+                            ? item.totalCost === 0
+                              ? null
+                              : item.totalCost?.toFixed(2) + " AED"
+                            : null}
+                        </td>
                       </tr>
                     ))}
                 </tbody>
@@ -849,6 +842,8 @@ const OrderForm: React.FC<OrderInterface> = ({
           <button
             type="button"
             onClick={() =>
+              {
+              console.log(supplier.bankDetails);
               GeneratePDF(
                 purchaseOrderNo,
                 entity,
@@ -859,6 +854,7 @@ const OrderForm: React.FC<OrderInterface> = ({
                 orderDate,
                 deliveryDate
               )
+              }
             }
             className="btn-yellow"
           >

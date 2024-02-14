@@ -4,22 +4,7 @@ import { FaCheck } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-
-export interface SupplierInterface {
-  _id: string;
-  supplierCode: string;
-  supplierName: string;
-  supplierTRN: number;
-  supplierAddress: {
-    address: string;
-    POBox: string;
-    country: string;
-  };
-  contactName: string;
-  contactNo: string;
-  email: string;
-  paymentTerm: string;
-}
+import { SupplierInterface } from "./Interfaces";
 
 const SupplierForm: React.FC<SupplierInterface> = ({
   _id,
@@ -31,6 +16,7 @@ const SupplierForm: React.FC<SupplierInterface> = ({
   contactNo: existingContactNo,
   email: existingEmail,
   paymentTerm: existingPaymentTerm,
+  bankDetails: existingBankDetails,
 }) => {
   const router = useRouter();
   const [supplierCode, setSupplierCode] = useState(existingSupplierCode || "");
@@ -49,6 +35,15 @@ const SupplierForm: React.FC<SupplierInterface> = ({
   const [contactNo, setContactNo] = useState(existingContactNo || "");
   const [email, setEmail] = useState(existingEmail || "");
   const [paymentTerm, setPaymentTerm] = useState(existingPaymentTerm || "");
+  const [bankDetails, setBankDetails] = useState(
+    existingBankDetails || {
+      beneficiary: "",
+      bank: "",
+      swiftCode: "",
+      accountNumber: "",
+      iban: "",
+    }
+  );
 
   async function saveSupplier(e: React.FormEvent) {
     e.preventDefault();
@@ -60,7 +55,8 @@ const SupplierForm: React.FC<SupplierInterface> = ({
       contactName,
       contactNo,
       email,
-      paymentTerm
+      paymentTerm,
+      bankDetails,
     };
     if (_id) {
       await axios.put("/api/suppliers", { ...data, _id });
@@ -182,6 +178,84 @@ const SupplierForm: React.FC<SupplierInterface> = ({
             value={paymentTerm}
             onChange={(e) => setPaymentTerm(e.target.value)}
           />
+        </div>
+        <div className="projItems gap-3">
+          <label>
+            <strong>Bank Account Details</strong>
+          </label>
+          <div className="projItems w-full">
+            <label>Bank Beneficiary Name</label>
+            <input
+              type="text"
+              placeholder="Beneficiary Name"
+              value={bankDetails.beneficiary}
+              onChange={(e) =>
+                setBankDetails({
+                  ...bankDetails,
+                  beneficiary: e.target.value,
+                })
+              }
+            />
+          </div>
+          <div className="flex gap-2">
+            <div className="projItems w-full">
+              <label>Bank Name/Branch</label>
+              <input
+                type="text"
+                placeholder="Bank Name"
+                value={bankDetails.bank}
+                onChange={(e) =>
+                  setBankDetails({
+                    ...bankDetails,
+                    bank: e.target.value,
+                  })
+                }
+              />
+            </div>
+            <div className="projItems w-full">
+              <label>Bank Swift code</label>
+              <input
+                type="text"
+                placeholder="Bank Swift Code"
+                value={bankDetails.swiftCode}
+                onChange={(e) =>
+                  setBankDetails({
+                    ...bankDetails,
+                    swiftCode: e.target.value,
+                  })
+                }
+              />
+            </div>
+          </div>
+          <div className="projItems max-w-3xl">
+            <label>Account Number</label>
+            <input
+              type="Number"
+              className="number-input"
+              placeholder="Account No."
+              value={bankDetails.accountNumber}
+              onChange={(e) =>
+                setBankDetails({
+                  ...bankDetails,
+                  accountNumber: e.target.value,
+                })
+              }
+            />
+          </div>
+          <div className="projItems max-w-3xl">
+            <label>IBAN Number</label>
+            <input
+              type="text"
+              placeholder="IBAN No."
+              value={bankDetails.iban}
+              onChange={(e) =>
+                setBankDetails({
+                  ...bankDetails,
+                  iban: e.target.value,
+                })
+              }
+            />
+          </div>
         </div>
         <div className="mt-2 flex gap-3">
           <button type="submit" className="btn-green">

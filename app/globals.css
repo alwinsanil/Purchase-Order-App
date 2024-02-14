@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  @apply bg-stone-900;
+  background-color: #1b1c1e;
 }
 h1 {
   @apply text-3xl font-extrabold;
@@ -29,7 +29,7 @@ label {
 }
 
 .activeNavItem {
-  @apply flex flex-row items-center bg-gray-200 p-1 pl-2 rounded-l-lg mr-0 pr-10 gap-2 text-lg;
+  @apply flex flex-row items-center bg-gray-50 p-1 pl-2 rounded-l-lg mr-0 pr-10 gap-2 text-lg;
 }
 
 .inactiveNavItem {
@@ -96,7 +96,6 @@ table.primary thead tr th {
 #grid td, #grid th {
   border: 1px solid black;
 }
-
 
 .my-popup-content {
   margin: auto;

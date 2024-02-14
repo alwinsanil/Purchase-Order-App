@@ -2205,6 +2205,11 @@ normalize-range@^0.1.2:
   resolved "https://registry.yarnpkg.com/normalize-range/-/normalize-range-0.1.2.tgz#2d10c06bdfd312ea9777695a4d28439456b75942"
   integrity sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA==
 
+number-currency@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/number-currency/-/number-currency-0.0.2.tgz#24e43654c09c50b32a0d275338d0341ce9a97be9"
+  integrity sha512-XUQZf6/2WTnW1By23rSy4bcgfz2CciVvXTWbQw8QIgiXebS7pW8L6bgtvJ3JJ3AUEehxYqz7lp4XkQXiZsOmwQ==
+
 object-assign@^4.0.1, object-assign@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/object-assign/-/object-assign-4.1.1.tgz#2109adc7965887cfc05cbbd442cac8bfbb360863"

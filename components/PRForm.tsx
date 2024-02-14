@@ -4,32 +4,8 @@ import { FaCheck } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-
-interface itemInterface {
-  fCodeAssembly: string;
-  totalAssembledQty: string;
-  fCodeAssemblyPart: string;
-  description: string;
-  material: string;
-  finish: string;
-  remarks: string;
-  alloy: string;
-  totalQty: number | null;
-  width: number | null;
-  thickness: number | null;
-  length: number | null;
-  volume: number | null;
-  weight: number | null;
-  totalKG: number | null;
-  totalTons: number | null;
-}
-
-interface PRInterface {
-  _id: string;
-  itemList: itemInterface[];
-  project: { _id: string; projectName: string; purchaseReqCount: number };
-  purchaseReqCode: string;
-}
+import Select from "react-select";
+import { PRInterface, itemInterface } from "./Interfaces";
 
 const PRForm: React.FC<PRInterface> = ({
   _id,
@@ -37,6 +13,29 @@ const PRForm: React.FC<PRInterface> = ({
   project: existingProject,
   purchaseReqCode: existingPrchaseReqCode,
 }) => {
+  //styling for react-select
+  const customStyles = {
+    control: (provided: any) => ({
+      ...provided,
+      fontSize: "1rem",
+      backgroundColor: "white",
+      borderColor: "#d1d5db",
+      borderRadius: "0.5rem",
+      boxShadow: "none",
+      "&:hover": {
+        borderColor: "#9ca3af",
+      },
+    }),
+    option: (provided: any, state: { isSelected: any; isFocused: any }) => ({
+      ...provided,
+      backgroundColor: state.isSelected
+        ? "#1C1917"
+        : state.isFocused
+        ? "#e5e7eb"
+        : null,
+      color: state.isSelected ? "#ffffff" : "#1f2937",
+    }),
+  };
   const router = useRouter();
   const [itemList, setItemList] = useState<itemInterface[]>([]);
   const [purchaseReqCode, setPurchaseReqCode] = useState("");
@@ -176,6 +175,8 @@ const PRForm: React.FC<PRInterface> = ({
           weight: null,
           totalKG: null,
           totalTons: null,
+          unitPrice: 0,
+          totalCost: 0,
         },
       ];
     });
@@ -187,7 +188,7 @@ const PRForm: React.FC<PRInterface> = ({
       });
     });
   }
-  function updatePR(value: string) {
+  function updatePR(value: string | undefined) {
     if (value !== "") {
       const propProject = allProjects.filter((en) => {
         return en._id === value;
@@ -233,7 +234,7 @@ const PRForm: React.FC<PRInterface> = ({
       <form onSubmit={savePR} className="flex flex-col gap-3 mt-3">
         <div className="projItems">
           <label>Project Name</label>
-          <select
+          {/* <select
             value={project?._id}
             disabled={editMode}
             onChange={(e) => updatePR(e.target.value)}
@@ -245,7 +246,21 @@ const PRForm: React.FC<PRInterface> = ({
                   {project.projectName}
                 </option>
               ))}
-          </select>
+          </select> */}
+          <Select
+            isSearchable
+            value={
+              project && project._id
+                ? allProjects.find((obj) => obj._id === project._id)
+                : null
+            }
+            placeholder="Select Project"
+            onChange={(selectedOption) => updatePR(selectedOption?._id)}
+            options={allProjects}
+            getOptionLabel={(option) => option.projectName}
+            getOptionValue={(option) => option._id}
+            styles={customStyles}
+          />
         </div>
         <div className="projItems">
           <h2>{project ? `PR Code: ${purchaseReqCode}` : ""}</h2>

@@ -11,7 +11,7 @@ const NewProduct = () => {
         entityCode: 0,
         entityAbbrev: "",
         entityName: ""
-      }} abbrev={""} projectName={""} contractNo={""} deliveryAddress={[]} contactPerson={""} />
+      }} abbrev={""} projectName={""} contractNo={""} deliveryAddress={[]} contactPerson={""} orderCount={0} purchaseReqCount={0} />
     </div>
   )
 }

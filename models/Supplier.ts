@@ -9,6 +9,7 @@ const SupplierSchema = new Schema({
   contactNo: { type: String, required: true },
   email: { type: String, required: true },
   paymentTerm: { type: String, required: true },
+  bankDetails: { type: Object, required: true },
 });
 
 export const Supplier = models?.Supplier || model("Supplier", SupplierSchema);

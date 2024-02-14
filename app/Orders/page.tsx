@@ -1,4 +1,5 @@
 "use client";
+import { OrderInterface } from "@/components/Interfaces";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -6,97 +7,39 @@ import { useEffect, useState } from "react";
 import { AiFillPlusSquare } from "react-icons/ai";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { IoIosWarning, IoMdEye } from "react-icons/io";
+import Select from 'react-select';
 import Popup from "reactjs-popup";
 
-interface itemInterface {
-  fCodeAssembly: string;
-  totalAssembledQty: string;
-  fCodeAssemblyPart: string;
-  description: string;
-  material: string;
-  finish: string;
-  remarks: string;
-  alloy: string;
-  totalQty: number;
-  width: number;
-  thickness: number;
-  length: number;
-  volume: number;
-  weight: number;
-  totalKG: number;
-  totalTons: number;
-  unitPrice: number;
-  totalCost: number;
-}
-
-interface OrderInterface {
-  _id: string;
-  purchaseOrderNo: string;
-  entity: {
-    _id: string;
-    entityCode: number;
-    entityAbbrev: string;
-    entityName: string;
-    entityTRN: number;
-    entityAddress: {
-      address: string;
-      POBox: string;
-      country: string;
-    };
-  };
-  project: {
-    _id: string;
-    entity: {
-      _id: string;
-      entityCode: number;
-      entityAbbrev: string;
-      entityName: string;
-    };
-    abbrev: string;
-    projectName: string;
-    contractNo: string;
-    deliveryAddress: {
-      address: string;
-      POBox: string;
-      country: string;
-    }[];
-    contactPerson: string;
-    orderCount: number;
-    purchaseReqCount: number;
-  };
-  supplier: {
-    _id: string;
-    supplierCode: string;
-    supplierName: string;
-    supplierTRN: number;
-    supplierAddress: {
-      address: string;
-      POBox: string;
-      country: string;
-    };
-    contactName: string;
-    contactNo: string;
-    email: string;
-    paymentTerm: string;
-  };
-  purchaseReq: {
-    _id: string;
-    itemList: itemInterface[];
-    project: { _id: string; projectName: string; purchaseReqCount: number };
-    purchaseReqCode: string;
-  };
-  deliveryAddress: { address: string; POBox: string; country: string };
-  orderDate: Date;
-  deliveryDate: Date | undefined;
-}
-
 const Orders = () => {
+  //styling for react-select
+  const customStyles = {
+    control: (provided: any) => ({
+      ...provided,
+      fontSize: "1rem",
+      backgroundColor: "white",
+      borderColor: "#d1d5db",
+      borderRadius: "0.5rem",
+      boxShadow: "none",
+      "&:hover": {
+        borderColor: "#9ca3af",
+      },
+    }),
+    option: (provided: any, state: { isSelected: any; isFocused: any }) => ({
+      ...provided,
+      backgroundColor: state.isSelected
+        ? "#1C1917"
+        : state.isFocused
+        ? "#e5e7eb"
+        : null,
+      color: state.isSelected ? "#ffffff" : "#1f2937",
+    }),
+  };
   const router = useRouter();
   const [project, setProject] = useState({
     _id: "",
     projectName: "",
     purchaseReqCount: 0,
-    orderCount:  0,
+    orderCount: 0,
   });
   const [allProjects, setAllProjects] = useState([
     {
@@ -121,7 +64,7 @@ const Orders = () => {
     });
   }, [deletedId]);
 
-  function updateOrders(value: string) {
+  function updateOrders(value: string | undefined) {
     if (value !== "") {
       const propProject = allProjects.filter((en) => {
         return en._id === value;
@@ -133,7 +76,12 @@ const Orders = () => {
         })
       );
     } else {
-      setProject({ _id: "", projectName: "", purchaseReqCount: 0, orderCount: 0 });
+      setProject({
+        _id: "",
+        projectName: "",
+        purchaseReqCount: 0,
+        orderCount: 0,
+      });
     }
   }
   function deletePR(_id: string, projectid: string) {
@@ -155,7 +103,7 @@ const Orders = () => {
       </Link>
       <div className="projItems mt-3">
         <label>Project Name</label>
-        <select
+        {/* <select
           value={project?._id}
           onChange={(e) => updateOrders(e.target.value)}
         >
@@ -166,11 +114,27 @@ const Orders = () => {
                 {project.projectName}
               </option>
             ))}
-        </select>
+        </select> */}
+        <Select
+          isSearchable
+          value={
+            project && project._id
+              ? allProjects.find((obj) => obj._id === project._id)
+              : null
+          }
+          placeholder="Select Project"
+          onChange={(selectedOption) =>
+            updateOrders(selectedOption ? selectedOption._id : undefined)
+          }
+          options={allProjects}
+          getOptionLabel={(option) => option.projectName}
+          getOptionValue={(option) => option._id}
+          styles={customStyles}
+        />
         <table className="primary mt-3">
           <thead>
             <tr>
-              <th>PR Code</th>
+              <th>Order No.</th>
               <th>Project</th>
               <th>Supplier</th>
               <th>PR No.</th>
@@ -246,10 +210,7 @@ const Orders = () => {
                               <button
                                 className="px-4 py-2 text-white bg-red-700 rounded"
                                 onClick={() => {
-                                  deletePR(
-                                    o._id,
-                                    o.project._id
-                                  );
+                                  deletePR(o._id, o.project._id);
                                   router.push("/Orders");
                                   close();
                                 }}

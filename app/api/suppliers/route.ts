@@ -14,6 +14,7 @@ export async function POST(req: NextApiRequest) {
     contactNo,
     email,
     paymentTerm,
+    bankDetails,
   } = await (req as any).json();
   const SupplierDoc = await Supplier.create({
     supplierCode,
@@ -24,6 +25,7 @@ export async function POST(req: NextApiRequest) {
     contactNo,
     email,
     paymentTerm,
+    bankDetails,
   });
   return NextResponse.json(SupplierDoc);
 }
@@ -40,6 +42,7 @@ export async function PUT(req: NextApiRequest) {
     contactNo,
     email,
     paymentTerm,
+    bankDetails,
   } = await(req as any).json();
   const SupplierDoc = await Supplier.updateOne(
     { _id },
@@ -52,6 +55,7 @@ export async function PUT(req: NextApiRequest) {
       contactNo,
       email,
       paymentTerm,
+      bankDetails,
     }
   );
   return NextResponse.json(SupplierDoc);

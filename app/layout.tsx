@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Roboto } from "next/font/google";
+import { Montserrat } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 
-const inter = Roboto({ weight: "400", subsets: ["latin"] });
+const inter = Montserrat({ weight: "400", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "PO Generator",
@@ -28,3 +28,4 @@ export default function RootLayout({
     </html>
   );
 }
+//bg-gray-50

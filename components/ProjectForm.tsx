@@ -2,27 +2,13 @@ import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { AiFillPlusSquare } from "react-icons/ai";
 import { FaCheck } from "react-icons/fa6";
 import { MdCancel } from "react-icons/md";
+import Select from "react-select";
+import { ProjectInterface } from "./Interfaces";
 
-export interface ProjectInterface {
-  _id: string;
-  entity: {
-    _id: string;
-    entityCode: number;
-    entityAbbrev: string;
-    entityName: string;
-  };
-  abbrev: string;
-  projectName: string;
-  contractNo: string;
-  deliveryAddress: {
-    address: string;
-    POBox: string;
-    country: string;
-  }[];
-  contactPerson: string;
-}
+
 
 const ProjectForm: React.FC<ProjectInterface> = ({
   _id,
@@ -33,6 +19,29 @@ const ProjectForm: React.FC<ProjectInterface> = ({
   deliveryAddress: existingDeliveryAddresses,
   contactPerson: existingContactPerson,
 }) => {
+  //styling for react-select
+  const customStyles = {
+    control: (provided: any) => ({
+      ...provided,
+      fontSize: "1rem",
+      backgroundColor: "white",
+      borderColor: "#d1d5db",
+      borderRadius: "0.5rem",
+      boxShadow: "none",
+      "&:hover": {
+        borderColor: "#9ca3af",
+      },
+    }),
+    option: (provided: any, state: { isSelected: any; isFocused: any }) => ({
+      ...provided,
+      backgroundColor: state.isSelected
+        ? "#1C1917"
+        : state.isFocused
+        ? "#e5e7eb"
+        : null,
+      color: state.isSelected ? "#ffffff" : "#1f2937",
+    }),
+  };
   const router = useRouter();
   const [abbrev, setAbbrev] = useState("");
   const [projectName, setProjectName] = useState("");
@@ -105,7 +114,7 @@ const ProjectForm: React.FC<ProjectInterface> = ({
       });
     });
   }
-  function entityUpdate(value: string) {
+  function updateEntity(value: string | undefined) {
     if (value !== "") {
       const propEntity = allEntities.filter((en) => {
         return en._id === value;
@@ -148,9 +157,9 @@ const ProjectForm: React.FC<ProjectInterface> = ({
       <form onSubmit={saveProject} className="flex flex-col gap-3 mt-3">
         <div className="projItems">
           <label>Entity Name</label>
-          <select
+          {/* <select
             value={entity?._id}
-            onChange={(e) => entityUpdate(e.target.value)}
+            onChange={(e) => updateEntity(e.target.value)}
           >
             <option value="">Select Entity</option>
             {!!allEntities?.length &&
@@ -159,7 +168,21 @@ const ProjectForm: React.FC<ProjectInterface> = ({
                   {entity.entityName}
                 </option>
               ))}
-          </select>
+          </select> */}
+          <Select
+            isSearchable
+            value={
+              entity && entity._id
+                ? allEntities.find((obj) => obj._id === entity._id)
+                : null
+            }
+            placeholder="Select Entity"
+            onChange={(selectedOption) => updateEntity(selectedOption?._id)}
+            options={allEntities}
+            getOptionLabel={(option) => option.entityName}
+            getOptionValue={(option) => option._id}
+            styles={customStyles}
+          />
         </div>
         <div className="flex gap-4">
           <div className="projItems">
@@ -193,6 +216,7 @@ const ProjectForm: React.FC<ProjectInterface> = ({
         <div className="projItems gap-2">
           <label>Delivery Address</label>
           <button type="button" className="btn-1" onClick={() => addAddress()}>
+            <AiFillPlusSquare className="plusIcon" />
             Add New Address
           </button>
           {!!deliveryAddress?.length &&

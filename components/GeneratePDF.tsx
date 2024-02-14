@@ -1,20 +1,11 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { EntityInterface } from "./EntityForm";
-import { ProjectInterface } from "./ProjectForm";
-import { SupplierInterface } from "./SupplierForm";
-import { itemInterface } from "./OrderForm";
+import { convertCurrency } from "number-currency";
 import "../lib/ARIAL-normal";
 import "../lib/ARIAL-bold";
 import "../lib/ARIAL-italic";
 import "../lib/ARIAL-bolditalic";
-
-interface PRInterface {
-  _id: string;
-  itemList: itemInterface[];
-  project: { _id: string; projectName: string; purchaseReqCount: number };
-  purchaseReqCode: string;
-}
+import { EntityInterface, PRInterface, ProjectInterface, SupplierInterface } from "./Interfaces";
 
 export default function GeneratePDF(
   fileName: string,
@@ -47,6 +38,9 @@ export default function GeneratePDF(
   }
   const vat = (5 / 100) * netAmount;
   const totalAmount = netAmount + vat;
+  const tempAmount = Number(totalAmount.toFixed(2));
+  const words = convertCurrency(tempAmount, "aed");
+  const finalWords = words.charAt(0).toUpperCase() + words.slice(1);
 
   //Logo
   doc.addImage(imgData, "PNG", 16.5, 5.5, 53, 12);
@@ -229,7 +223,12 @@ export default function GeneratePDF(
       { header: "Unit Price", dataKey: "up" },
       { header: "Total", dataKey: "total" },
     ],
-    columnStyles: { desc: { minCellWidth: 80 }, total: { halign: "right" } },
+    columnStyles: {
+      qty: { halign: "center" },
+      desc: { minCellWidth: 80 },
+      up: { halign: "center" },
+      total: { halign: "right" },
+    },
     head: [["QUANTITY", "DESCRIPTION", "Unit Price", "TOTAL"]],
     body: purchasereq.itemList.map((item) => [
       String(item.totalQty),
@@ -242,6 +241,9 @@ export default function GeneratePDF(
   // @ts-expect-error
   let finalY = doc.lastAutoTable.finalY;
   doc.setFont("ARIAL", "bolditalic");
+  doc.setFontSize(8);
+  doc.text("AED: " + finalWords, 27, finalY + 6);
+  doc.setFontSize(7);
   text = "Net Amount: ";
   x =
     pgwidth -
@@ -260,6 +262,63 @@ export default function GeneratePDF(
     (doc.getStringUnitWidth(text) * 7) / doc.internal.scaleFactor -
     47;
   doc.text(text, x, finalY + 13);
+  doc.setFont("ARIAL", "bold");
+  doc.text("Supplier Bank Details: ", 27, finalY + 15);
+  doc.line(
+    27,
+    finalY + 15.5,
+    27 + doc.getTextWidth("Supplier Bank Details: "),
+    finalY + 15.5
+  );
+  doc.setFont("ARIAL", "normal");
+  doc.text("Bank Beneficiary Name: " + supplier.bankDetails.beneficiary, 27, finalY + 19);
+  doc.text("Bank Name / Branch: " + supplier.bankDetails.bank, 27, finalY + 22.5);
+  doc.text("Account No.: " + supplier.bankDetails.accountNumber, 27, finalY + 26);
+  doc.text("IBAN No.: " + supplier.bankDetails.iban, 27, finalY + 29.5);
+  doc.text("Bank Swift Code: " + supplier.bankDetails.swiftCode, 27, finalY + 33);
+  doc.setFont("ARIAL", "bold");
+  doc.text("Notes: ", 27, finalY + 38);
+  doc.line(27, finalY + 38.5, 27 + doc.getTextWidth("Notes:"), finalY + 38.5);
+  doc.setFont("ARIAL", "italic");
+  doc.text("• " + "Quote Ref: ", 27, finalY + 42);
+  doc.text(
+    "• " +
+      "All Necessary QA/QC procedures to be followed. All require material and test certificates to be provided.",
+    27,
+    finalY + 45.5
+  );
+  doc.setFont("ARIAL", "bold");
+  doc.text("Delivery: ", 27, finalY + 50);
+  doc.line(
+    27,
+    finalY + 50.5,
+    27 + doc.getTextWidth("Delivery:"),
+    finalY + 50.5
+  );
+  doc.setFont("ARIAL", "italic");
+  doc.text(" ", 27, finalY + 54);
+  doc.setFont("ARIAL", "bold");
+  doc.text("Payment Terms: ", 27, finalY + 59);
+  doc.line(
+    27,
+    finalY + 59.5,
+    27 + doc.getTextWidth("Payment Terms:"),
+    finalY + 59.5
+  );
+  doc.setFont("ARIAL", "italic");
+  doc.text(supplier.paymentTerm, 27, finalY + 63);
+  doc.setFont("ARIAL", "bolditalic");
+  doc.text("All invoices to be addressed to:", 27, finalY + 67);
+  doc.text(entity.entityName, 27, finalY + 70.3);
+  doc.text(
+    entity.entityAddress.address +
+      ", P.O. Box No: " +
+      entity.entityAddress.POBox +
+      ", " +
+      entity.entityAddress.country,
+    27,
+    finalY + 74
+  );
   autoTable(doc, {
     theme: "plain",
     startY: finalY,
@@ -272,8 +331,56 @@ export default function GeneratePDF(
       cellPadding: 1,
       halign: "right",
     },
-    body: [[netAmount], [vat], [totalAmount]],
+    body: [[netAmount.toFixed(2)], [vat.toFixed(2)], [totalAmount.toFixed(2)]],
     margin: { left: 165.3, right: 24 },
+  });
+  doc.setFont("ARIAL", "bold");
+  text = "Authorized By: ";
+  doc.text(text, 24, 255);
+  doc.line(doc.getTextWidth(text) + 24, 255, mid - 3, 255);
+  doc.text(text, mid + 2, 255);
+  doc.line(doc.getTextWidth(text) + mid + 2, 255, pgwidth - 24, 255);
+  text = "Name Printed: ";
+  doc.text(text, 24, 261);
+  doc.line(doc.getTextWidth(text) + 24, 261, mid - 3, 261);
+  doc.text(text, mid + 2, 261);
+  doc.line(doc.getTextWidth(text) + mid + 2, 261, pgwidth - 24, 261);
+  autoTable(doc, {
+    theme: "plain",
+    startY: 265,
+    bodyStyles: {
+      font: "ARIAL",
+      fontStyle: "normal",
+      fontSize: 7,
+      cellPadding: 1,
+      halign: "center",
+    },
+    body: [
+      [
+        "Original Copy to Supplier",
+        "Copy to Accounts",
+        "Copy to Purchasing",
+        "Copy to Project Team",
+      ],
+    ],
+    margin: { left: 22, right: 24 },
+  });
+  // @ts-expect-error
+  finalY = doc.lastAutoTable.finalY;
+  autoTable(doc, {
+    theme: "plain",
+    startY: finalY+3,
+    bodyStyles: {
+      font: "ARIAL",
+      fontStyle: "bold",
+      fontSize: 7,
+      lineWidth: 0.2,
+      lineColor: "#000",
+      cellPadding: 1,
+      halign: "center",
+    },
+    body: [["ALL PRICES SHOWN EXCLUDED VAT UNLESS STATED OTHERWISE, ORDER NUMBER MUST BE SHOWN ON INVOICES, DELIVERY NOTES, PACKING SLIPS, ETC."]],
+    margin: { left: 22, right: 24 },
   });
   doc.save(fileName + ".pdf");
 }
