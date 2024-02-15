@@ -157,18 +157,6 @@ const ProjectForm: React.FC<ProjectInterface> = ({
       <form onSubmit={saveProject} className="flex flex-col gap-3 mt-3">
         <div className="projItems">
           <label>Entity Name</label>
-          {/* <select
-            value={entity?._id}
-            onChange={(e) => updateEntity(e.target.value)}
-          >
-            <option value="">Select Entity</option>
-            {!!allEntities?.length &&
-              allEntities.map((entity) => (
-                <option key={entity._id} value={entity._id}>
-                  {entity.entityName}
-                </option>
-              ))}
-          </select> */}
           <Select
             isSearchable
             value={

@@ -93,4 +93,6 @@ export interface OrderInterface {
   deliveryAddress: { address: string; POBox: string; country: string };
   orderDate: Date;
   deliveryDate: Date | undefined;
+  notes: string[],
+  deliveryTerms: string[],
 }

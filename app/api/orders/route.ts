@@ -10,20 +10,26 @@ export async function POST(req: NextApiRequest) {
     entity,
     project,
     supplier,
+    selectedItems,
     purchaseReq,
     deliveryAddress,
     orderDate,
     deliveryDate,
-  } = await (req as any).json();
+    notes,
+    deliveryTerms,
+  } = await(req as any).json();
   const OrderDoc = await Order.create({
     purchaseOrderNo,
     entity,
     project,
     supplier,
+    selectedItems,
     purchaseReq,
     deliveryAddress,
     orderDate,
     deliveryDate,
+    notes,
+    deliveryTerms,
   });
   return NextResponse.json(OrderDoc);
 }
@@ -36,11 +42,14 @@ export async function PUT(req: NextApiRequest) {
     entity,
     project,
     supplier,
+    selectedItems,
     purchaseReq,
     deliveryAddress,
     orderDate,
     deliveryDate,
-  } = await (req as any).json();
+    notes,
+    deliveryTerms,
+  } = await(req as any).json();
   const OrderDoc = await Order.updateOne(
     { _id },
     {
@@ -48,10 +57,13 @@ export async function PUT(req: NextApiRequest) {
       entity,
       project,
       supplier,
+      selectedItems,
       purchaseReq,
       deliveryAddress,
       orderDate,
       deliveryDate,
+      notes,
+      deliveryTerms,
     }
   );
   return NextResponse.json(OrderDoc);

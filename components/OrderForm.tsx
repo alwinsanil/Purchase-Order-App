@@ -7,7 +7,12 @@ import { MdCancel } from "react-icons/md";
 import Select from "react-select";
 import GeneratePDF from "./GeneratePDF";
 import { FaFilePdf } from "react-icons/fa6";
-import { EntityInterface, ProjectInterface, SupplierInterface } from "./Interfaces";
+import {
+  EntityInterface,
+  ProjectInterface,
+  SupplierInterface,
+} from "./Interfaces";
+import { AiFillPlusSquare } from "react-icons/ai";
 
 interface itemInterface {
   fCodeAssembly: string;
@@ -36,6 +41,7 @@ interface OrderInterface {
   entity: EntityInterface;
   project: ProjectInterface;
   supplier: SupplierInterface;
+  selectedItems: itemInterface[];
   purchaseReq: {
     _id: string;
     itemList: itemInterface[];
@@ -45,6 +51,8 @@ interface OrderInterface {
   deliveryAddress: { address: string; POBox: string; country: string };
   orderDate: Date;
   deliveryDate: Date | undefined;
+  notes: string[];
+  deliveryTerms: string[];
 }
 
 const OrderForm: React.FC<OrderInterface> = ({
@@ -53,10 +61,13 @@ const OrderForm: React.FC<OrderInterface> = ({
   entity: existingEntity,
   project: existingProject,
   supplier: existingSupplier,
+  selectedItems: existingSelectedItems,
   purchaseReq: existingPurchaseReq,
   deliveryAddress: existingDeliveryAddress,
   orderDate: existingOrderDate,
   deliveryDate: existingDeliveryDate,
+  notes: existingNotes,
+  deliveryTerms: existingDeliveryTerms,
 }) => {
   const router = useRouter();
 
@@ -267,6 +278,9 @@ const OrderForm: React.FC<OrderInterface> = ({
       purchaseReqCount: 0,
     },
   });
+  const [selectedItems, setSelectedItems] = useState<itemInterface[]>([]);
+  const [notes, setNotes] = useState<string[]>([]);
+  const [deliveryTerms, setDeliveryTerms] = useState<string[]>([]);
   const [purchaseOrderNo, setPurchaseOrderNo] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState({
     address: "",
@@ -277,6 +291,9 @@ const OrderForm: React.FC<OrderInterface> = ({
   const [deliveryDate, setDeliveryDate] = useState<Date | undefined>(
     new Date()
   );
+  //checkboxes
+  const [selectAll, setSelectAll] = useState(false);
+  const [checkboxes, setCheckboxes] = useState([false, false, false]);
 
   //useEffects
   useEffect(() => {
@@ -284,18 +301,24 @@ const OrderForm: React.FC<OrderInterface> = ({
     setEntity(existingEntity);
     setProject(existingProject);
     setSupplier(existingSupplier);
+    setSelectedItems(existingSelectedItems);
     setPurchaseReq(existingPurchaseReq);
     setDeliveryAddress(existingDeliveryAddress);
     setDeliveryDate(existingDeliveryDate);
     setorderDate(existingOrderDate);
+    setNotes(existingNotes);
+    setDeliveryTerms(existingDeliveryTerms);
   }, [
     existingDeliveryAddress,
     existingDeliveryDate,
+    existingDeliveryTerms,
     existingEntity,
+    existingNotes,
     existingOrderDate,
     existingProject,
     existingPurchaseOrderNo,
     existingPurchaseReq,
+    existingSelectedItems,
     existingSupplier,
   ]);
   useEffect(() => {
@@ -485,6 +508,66 @@ const OrderForm: React.FC<OrderInterface> = ({
     }
     setPurchaseReq(updatedPurchaseReq);
   }
+  function handleSelectAll() {
+    setSelectAll(!selectAll);
+    setCheckboxes(checkboxes.map(() => !selectAll));
+    if (!selectAll) {
+      setSelectedItems([...purchaseReq.itemList]);
+    } else {
+      setSelectedItems([]);
+    }
+  }
+  function handleSingleCheck(index: number) {
+    const item = purchaseReq.itemList[index];
+    const isSelected = selectedItems.some(
+      (selectedItem) => selectedItem.description === item.description
+    );
+
+    if (!isSelected) {
+      setSelectedItems([...selectedItems, item]);
+    } else {
+      setSelectedItems(
+        selectedItems.filter(
+          (selectedItem) => selectedItem.description !== item.description
+        )
+      );
+    }
+  }
+  function addNotes() {
+    setNotes((prev) => {
+      return [...prev, ""];
+    });
+  }
+  function removeNotes(indexToRemove: number) {
+    setNotes((prev) => {
+      return [...prev].filter((_, index) => {
+        return index !== indexToRemove;
+      });
+    });
+  }
+  function handleNotesChange(index: number, newNote: string) {
+    const newNotes = [...notes];
+    newNotes[index] = newNote;
+    setNotes(newNotes);
+  }
+  function addDeliveryTerms() {
+    setDeliveryTerms((prev) => {
+      return [...prev, ""];
+    });
+  }
+  function removeDeliveryTerms(indexToRemove: number) {
+    setDeliveryTerms((prev) => {
+      return [...prev].filter((_, index) => {
+        return index !== indexToRemove;
+      });
+    });
+  }
+  function handleDeliveryTermsChange(index: number, newDeliveryTerm: string) {
+    const newDeliveryTerms = [...deliveryTerms];
+    newDeliveryTerms[index] = newDeliveryTerm;
+    setDeliveryTerms(newDeliveryTerms);
+  }
+
   async function saveOrder(e: React.FormEvent) {
     e.preventDefault();
     if (project._id === "") {
@@ -496,17 +579,19 @@ const OrderForm: React.FC<OrderInterface> = ({
       entity,
       project,
       supplier,
+      selectedItems,
       purchaseReq,
       deliveryAddress,
       orderDate,
       deliveryDate,
+      notes,
+      deliveryTerms,
     };
 
     const count = Number(project.orderCount) + 1;
-    console.log(count);
 
     if (_id) {
-      await axios.put("/api/pr", { ...data, _id });
+      await axios.put("/api/orders", { ...data, _id });
     } else {
       await axios.post("/api/orders", data);
       await axios.put("/api/projects", {
@@ -728,7 +813,7 @@ const OrderForm: React.FC<OrderInterface> = ({
                 )}
               </div>
             </div>
-            <div className="">
+            <div>
               <label>Dates</label>
               <div className="grid grid-cols-2">
                 <div>
@@ -790,6 +875,13 @@ const OrderForm: React.FC<OrderInterface> = ({
               <table className="primary mt-3">
                 <thead>
                   <tr>
+                    <th>
+                      <input
+                        type="checkbox"
+                        checked={selectAll}
+                        onChange={handleSelectAll}
+                      />
+                    </th>
                     <th>Quantity</th>
                     <th>Description</th>
                     <th>Material</th>
@@ -802,6 +894,17 @@ const OrderForm: React.FC<OrderInterface> = ({
                   {purchaseReq._id != "" &&
                     purchaseReq.itemList.map((item: any, index: number) => (
                       <tr key={index}>
+                        <td>
+                          <input
+                            type="checkbox"
+                            checked={selectedItems.some(
+                              (item) =>
+                                item.description ===
+                                purchaseReq.itemList[index].description
+                            )}
+                            onChange={() => handleSingleCheck(index)}
+                          />
+                        </td>
                         <td>{item.totalQty}</td>
                         <td>{item.description}</td>
                         <td>{item.material}</td>
@@ -831,6 +934,72 @@ const OrderForm: React.FC<OrderInterface> = ({
                 </tbody>
               </table>
             </div>
+            <div className="flex flex-col gap-1 mt-2">
+              <div className="flex gap-2 mb-2">
+                <label>Notes</label>
+                <button
+                  type="button"
+                  className="btn-sm"
+                  onClick={() => addNotes()}
+                >
+                  <AiFillPlusSquare className="plusIcon-sm" />
+                  Add New Note
+                </button>
+              </div>
+              {!!notes?.length &&
+                notes.map((note, index) => (
+                  <div className="flex gap-2" key={index}>
+                    <input
+                      className="flex-grow"
+                      type="text"
+                      placeholder="Note"
+                      value={note}
+                      onChange={(e) => handleNotesChange(index, e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeNotes(index)}
+                      className="bg-red-800 py-1 px-2 rounded-lg"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                ))}
+            </div>
+            <div className="flex flex-col gap-1 mt-2">
+              <div className="flex gap-2 mb-2">
+                <label>Delivery Terms</label>
+                <button
+                  type="button"
+                  className="btn-sm"
+                  onClick={() => addDeliveryTerms()}
+                >
+                  <AiFillPlusSquare className="plusIcon-sm" />
+                  Add New Delivery Term
+                </button>
+              </div>
+              {!!deliveryTerms?.length &&
+                deliveryTerms.map((dt, index) => (
+                  <div className="flex gap-2" key={index}>
+                    <input
+                      className="flex-grow"
+                      type="text"
+                      placeholder="Delivery Term"
+                      value={dt}
+                      onChange={(e) =>
+                        handleDeliveryTermsChange(index, e.target.value)
+                      }
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeDeliveryTerms(index)}
+                      className="bg-red-800 py-1 px-2 rounded-lg"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                ))}
+            </div>
           </>
         )}
         <div className="flex gap-2"></div>
@@ -841,21 +1010,21 @@ const OrderForm: React.FC<OrderInterface> = ({
           </button>
           <button
             type="button"
-            onClick={() =>
-              {
+            onClick={() => {
               console.log(supplier.bankDetails);
               GeneratePDF(
                 purchaseOrderNo,
                 entity,
                 project,
                 supplier,
-                purchaseReq,
+                selectedItems,
                 deliveryAddress,
                 orderDate,
-                deliveryDate
-              )
-              }
-            }
+                deliveryDate,
+                notes,
+                deliveryTerms
+              );
+            }}
             className="btn-yellow"
           >
             <FaFilePdf />

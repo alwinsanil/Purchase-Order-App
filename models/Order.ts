@@ -5,10 +5,13 @@ const OrderSchema = new Schema({
   entity: { type: Object, required: true },
   project: { type: Object, required: true },
   supplier: { type: Object, required: true },
+  selectedItems: [{ type: Object, required: true }],
   purchaseReq: { type: Object, required: true },
   deliveryAddress: { type: Object, required: true },
   orderDate: { type: Date, required: true },
   deliveryDate: { type: Date, required: true },
+  notes: [{ type: String }],
+  deliveryTerms: [{ type: String }],
 });
 
 export const Order = models?.Order || model("Order", OrderSchema);

@@ -40,6 +40,10 @@ label {
   @apply flex items-center max-w-fit justify-center gap-2 text-lg font-bold border-2 border-black py-1 px-2 rounded-lg hover:bg-gray-300;
 }
 
+.btn-sm {
+  @apply flex items-center max-w-fit justify-center gap-2 text-sm font-bold border-2 border-black py-1 px-2 rounded-lg hover:bg-gray-300;
+}
+
 .btn-green {
   @apply bg-green-600 text-lg py-1 px-2 rounded-lg flex items-center justify-center gap-1;
 }
@@ -62,6 +66,10 @@ label {
 
 .plusIcon {
   @apply rounded-xl w-6 h-6;
+}
+
+.plusIcon-sm {
+  @apply rounded-xl w-4 h-4;
 }
 
 .projItems {

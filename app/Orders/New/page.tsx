@@ -75,6 +75,28 @@ const NewOrder = () => {
         }}
         orderDate={new Date()}
         deliveryDate={undefined}
+        notes={[]}
+        deliveryTerms={[]}
+        selectedItems={[{
+          fCodeAssembly: "",
+          totalAssembledQty: "",
+          fCodeAssemblyPart: "",
+          description: "",
+          material: "",
+          finish: "",
+          remarks: "",
+          alloy: "",
+          totalQty: 0,
+          width: 0,
+          thickness: 0,
+          length: 0,
+          volume: 0,
+          weight: 0,
+          totalKG: 0,
+          totalTons: 0,
+          unitPrice: 0,
+          totalCost: 0,
+        }]}
       />
     </div>
   );
