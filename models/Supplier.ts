@@ -5,6 +5,7 @@ const SupplierSchema = new Schema({
   supplierName: { type: String, required: true },
   supplierAddress: { type: Object, required: true },
   supplierTRN: { type: Number, required: true },
+  oxaion: { type: Number, required: true },
   contactName: { type: String, required: true },
   contactNo: { type: String, required: true },
   email: { type: String, required: true },

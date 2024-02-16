@@ -14,7 +14,6 @@ const EditProject = ({ params }: { params: { id: string } }) => {
       setProjectInfo(response.data);
     });
   }, [id]);
-  console.log(projectInfo);
   return (
     <>
       <h2>Edit details of {projectInfo?.projectName}</h2>

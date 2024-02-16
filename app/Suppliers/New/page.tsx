@@ -20,6 +20,14 @@ const NewSupplier = () => {
         contactNo={""}
         email={""}
         paymentTerm={""}
+        bankDetails={{
+          beneficiary: "",
+          bank: "",
+          swiftCode: "",
+          accountNumber: "",
+          iban: "",
+        }}
+        oxaion={0}
       />
     </div>
   );

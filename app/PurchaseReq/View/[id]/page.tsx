@@ -13,7 +13,6 @@ const ViewPR = ({ params }: { params: { id: string } }) => {
       setPurchaseReqInfo(response.data);
     });
   }, [id]);
-  console.log(purchaseReqInfo);
   return (
     <div>
       <h2>Details of {purchaseReqInfo?.purchaseReqCode}</h2>

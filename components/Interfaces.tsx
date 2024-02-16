@@ -59,6 +59,7 @@ export interface SupplierInterface {
   supplierCode: string;
   supplierName: string;
   supplierTRN: number;
+  oxaion: number;
   supplierAddress: {
     address: string;
     POBox: string;
@@ -81,6 +82,7 @@ export interface SupplierValidationInterface {
   supplierCode: boolean;
   supplierName: boolean;
   supplierTRN: boolean;
+  oxaion: boolean;
   supplierAddress: {
     address: boolean;
     POBox: boolean;

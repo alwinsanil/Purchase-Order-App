@@ -7,7 +7,6 @@ import "../lib/ARIAL-italic";
 import "../lib/ARIAL-bolditalic";
 import {
   EntityInterface,
-  PRInterface,
   ProjectInterface,
   SupplierInterface,
   itemInterface,

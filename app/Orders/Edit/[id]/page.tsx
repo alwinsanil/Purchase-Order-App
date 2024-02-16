@@ -14,7 +14,6 @@ const EditOrder = ({ params }: { params: { id: string } }) => {
       setOrderInfo(response.data);
     });
   }, [id]);
-  console.log(orderInfo);
   return (
     <>
       <h2>Edit details of {orderInfo?.purchaseOrderNo}</h2>

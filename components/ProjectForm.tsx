@@ -6,9 +6,7 @@ import { AiFillPlusSquare } from "react-icons/ai";
 import { FaCheck } from "react-icons/fa6";
 import { MdCancel } from "react-icons/md";
 import Select from "react-select";
-import { ProjectInterface } from "./Interfaces";
-
-
+import { ProjectInterface, ProjectValidationInterface } from "./Interfaces";
 
 const ProjectForm: React.FC<ProjectInterface> = ({
   _id,
@@ -25,11 +23,11 @@ const ProjectForm: React.FC<ProjectInterface> = ({
       ...provided,
       fontSize: "1rem",
       backgroundColor: "white",
-      borderColor: "#d1d5db",
+      border: validation.entity._id ? "2px solid #e53e3e" : "1px solid #d1d5db",
       borderRadius: "0.5rem",
       boxShadow: "none",
       "&:hover": {
-        borderColor: "#9ca3af",
+        borderColor: validation.entity._id ? "#e53e3e" : "#9ca3af",
       },
     }),
     option: (provided: any, state: { isSelected: any; isFocused: any }) => ({
@@ -66,6 +64,15 @@ const ProjectForm: React.FC<ProjectInterface> = ({
       entityName: "",
     },
   ]);
+  const [validation, setValidation] = useState<ProjectValidationInterface>({
+    entity: {
+      _id: false,
+    },
+    abbrev: false,
+    projectName: false,
+    contractNo: false,
+    contactPerson: false,
+  });
   useEffect(() => {
     setAbbrev(existingAbbrev);
     setEntity(existingEntity);
@@ -124,32 +131,51 @@ const ProjectForm: React.FC<ProjectInterface> = ({
   }
   async function saveProject(e: React.FormEvent) {
     e.preventDefault();
-    if (entity._id === "") {
-      alert("Entity Cannot be Empty");
-      return;
-    }
-    const data = {
-      abbrev,
-      projectName,
-      contractNo,
-      contactPerson,
-      deliveryAddress: deliveryAddress.map((addr) => ({
-        address: addr.address,
-        POBox: addr.POBox,
-        country: addr.country,
-      })),
-      entity,
-    };
-    if (_id) {
-      await axios.put("/api/projects", { ...data, _id });
+
+    const newValidation = { ...validation };
+    if (!entity._id) newValidation.entity._id = true;
+    else newValidation.entity._id = false;
+    if (!abbrev) newValidation.abbrev = true;
+    else newValidation.abbrev = false;
+    if (!projectName) newValidation.projectName = true;
+    else newValidation.projectName = false;
+    if (!contractNo) newValidation.contractNo = true;
+    else newValidation.contractNo = false;
+    if (!contactPerson) newValidation.contactPerson = true;
+    else newValidation.contactPerson = false;
+
+    setValidation(newValidation);
+
+    if (
+      Object.keys(newValidation).every(
+        (key) => !newValidation[key as keyof ProjectValidationInterface]
+      )
+    ) {
+      const data = {
+        abbrev,
+        projectName,
+        contractNo,
+        contactPerson,
+        deliveryAddress: deliveryAddress.map((addr) => ({
+          address: addr.address,
+          POBox: addr.POBox,
+          country: addr.country,
+        })),
+        entity,
+      };
+      if (_id) {
+        await axios.put("/api/projects", { ...data, _id });
+      } else {
+        await axios.post("/api/projects", {
+          ...data,
+          purchaseReqCount,
+          orderCount,
+        });
+      }
+      router.push("/Projects");
     } else {
-      await axios.post("/api/projects", {
-        ...data,
-        purchaseReqCount,
-        orderCount,
-      });
+      alert("Enter missing details!");
     }
-    router.push("/Projects");
   }
 
   return (
@@ -180,6 +206,7 @@ const ProjectForm: React.FC<ProjectInterface> = ({
               placeholder="Abbrevation"
               value={abbrev}
               onChange={(e) => setAbbrev(e.target.value)}
+              className={validation.abbrev ? "error" : ""}
             />
           </div>
           <div className="projItems flex-grow">
@@ -189,6 +216,7 @@ const ProjectForm: React.FC<ProjectInterface> = ({
               placeholder="Project Name"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
+              className={validation.projectName ? "error" : ""}
             />
           </div>
         </div>
@@ -199,6 +227,7 @@ const ProjectForm: React.FC<ProjectInterface> = ({
             placeholder="Contract No."
             value={contractNo}
             onChange={(e) => setContractNo(e.target.value)}
+            className={validation.contractNo ? "error" : ""}
           />
         </div>
         <div className="projItems gap-2">
@@ -248,6 +277,7 @@ const ProjectForm: React.FC<ProjectInterface> = ({
             placeholder="Contact Person"
             value={contactPerson}
             onChange={(e) => setContactPerson(e.target.value)}
+            className={validation.contactPerson ? "error" : ""}
           />
         </div>
         <div className="mt-2 flex gap-3">

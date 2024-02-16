@@ -173,6 +173,7 @@ const OrderForm: React.FC<OrderInterface> = ({
     _id: "",
     supplierName: "",
     supplierTRN: 0,
+    oxaion: 0,
     supplierCode: "",
     supplierAddress: {
       address: "",
@@ -196,6 +197,7 @@ const OrderForm: React.FC<OrderInterface> = ({
       _id: "",
       supplierName: "",
       supplierTRN: 0,
+      oxaion: 0,
       supplierCode: "",
       supplierAddress: {
         address: "",
@@ -421,6 +423,7 @@ const OrderForm: React.FC<OrderInterface> = ({
         _id: "",
         supplierName: "",
         supplierTRN: 0,
+        oxaion: 0,
         supplierCode: "",
         supplierAddress: {
           address: "",
@@ -578,6 +581,12 @@ const OrderForm: React.FC<OrderInterface> = ({
       alert("Project Cannot be Empty");
       return;
     }
+    for (const item of selectedItems) {
+      if (!item.unitPrice) {
+        alert("Enter all the unit prices of selected items.");
+        return;
+      }
+    }
     const data = {
       purchaseOrderNo,
       entity,
@@ -624,6 +633,7 @@ const OrderForm: React.FC<OrderInterface> = ({
             getOptionLabel={(option) => option.entityName}
             getOptionValue={(option) => option._id}
             styles={customStyles}
+            required
           />
         </div>
         <div className="projItems">
@@ -643,6 +653,7 @@ const OrderForm: React.FC<OrderInterface> = ({
             getOptionLabel={(option) => option.projectName}
             getOptionValue={(option) => option._id}
             styles={customStyles}
+            required
           />
         </div>
         {project?._id && (
@@ -665,6 +676,7 @@ const OrderForm: React.FC<OrderInterface> = ({
             getOptionLabel={(option) => option.supplierName}
             getOptionValue={(option) => option._id}
             styles={customStyles}
+            required
           />
         </div>
         <div className="projItems">
@@ -710,19 +722,17 @@ const OrderForm: React.FC<OrderInterface> = ({
                   <p className="pt-2">
                     <strong>From: </strong>
                   </p>
-                  <div className="p-2">
-                    <p>
-                      {entity.entityName}, {entity.entityAddress.address},{" "}
-                      {entity.entityAddress.country}, P.O. Box:{" "}
-                      {entity.entityAddress.POBox}
-                    </p>
-                  </div>
+                  <p className="pt-2">
+                    {entity.entityName}, {entity.entityAddress.address},{" "}
+                    {entity.entityAddress.country}, P.O. Box:{" "}
+                    {entity.entityAddress.POBox}
+                  </p>
                 </div>
                 <div className="max-w-md flex gap-1">
-                  <p className="py-2">
+                  <p className="py-1">
                     <strong>Entity TRN: </strong>
                   </p>
-                  <div className="py-2">
+                  <div className="py-1">
                     <p>{entity.entityTRN}</p>
                   </div>
                 </div>
@@ -732,17 +742,14 @@ const OrderForm: React.FC<OrderInterface> = ({
               <label>Supplier Details</label>
               <div className="flex flex-col w-full">
                 <div className="max-w-md flex gap-1">
-                  <p className="pt-2">
+                  <p className="pt-2 mb-1">
                     <strong>To: </strong>
                   </p>
-                  <div className="p-2">
-                    <p>
-                      {supplier.supplierName},{" "}
-                      {supplier.supplierAddress.address},{" "}
-                      {supplier.supplierAddress.country}, P.O. Box:{" "}
-                      {supplier.supplierAddress.POBox}
-                    </p>
-                  </div>
+                  <p className="pt-2 mb-1">
+                    {supplier.supplierName}, {supplier.supplierAddress.address},{" "}
+                    {supplier.supplierAddress.country}, P.O. Box:{" "}
+                    {supplier.supplierAddress.POBox}
+                  </p>
                 </div>
 
                 <div className="max-w-md flex gap-1 mb-1">
@@ -1013,9 +1020,14 @@ const OrderForm: React.FC<OrderInterface> = ({
             Save
           </button>
           <button
-            type="button"
+            type="submit"
             onClick={() => {
-              console.log(supplier.bankDetails);
+              for (const item of selectedItems) {
+                if (!item.unitPrice) {
+                  alert("Enter all the unit prices of selected items.");
+                  return;
+                }
+              }
               GeneratePDF(
                 purchaseOrderNo,
                 entity,

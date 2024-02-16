@@ -77,7 +77,7 @@ const PRForm: React.FC<PRInterface> = ({
   useEffect(() => {
     for (const item of fileContents) {
       if (item.length && item.thickness && item.width && item.totalQty) {
-        item.volume = item.length * item.thickness * item.width / Math.pow(1000, 3);
+        item.volume = item.length * item.thickness * item.width / Math.pow(1000, 6);
         item.weight = item.volume * 2710;
         item.totalKG = item.weight * item.totalQty;
         item.totalTons = item.totalKG / 1000;
@@ -421,7 +421,7 @@ const PRForm: React.FC<PRInterface> = ({
                         handleVolumeChange(
                           index,
                           (item.width * item.thickness * item.length) /
-                            Math.pow(1000, 2)
+                            Math.pow(1000, 6)
                         );
                         if (item.volume) {
                           handleWeightChange(index, item.volume * 2710);
@@ -461,7 +461,7 @@ const PRForm: React.FC<PRInterface> = ({
                         handleVolumeChange(
                           index,
                           (width * item.thickness * item.length) /
-                            Math.pow(1000, 3)
+                            Math.pow(1000, 6)
                         );
                         if (item.volume) {
                           handleWeightChange(index, item.volume * 2710);
@@ -504,7 +504,7 @@ const PRForm: React.FC<PRInterface> = ({
                         handleVolumeChange(
                           index,
                           (thickness * item.width * item.length) /
-                            Math.pow(1000, 3)
+                            Math.pow(1000, 6)
                         );
                         if (item.volume) {
                           handleWeightChange(index, item.volume * 2710);
@@ -547,7 +547,7 @@ const PRForm: React.FC<PRInterface> = ({
                         handleVolumeChange(
                           index,
                           (length * item.thickness * item.width) /
-                            Math.pow(1000, 3)
+                            Math.pow(1000, 6)
                         );
                         if (item.volume) {
                           handleWeightChange(index, item.volume * 2710);

@@ -11,6 +11,7 @@ const SupplierForm: React.FC<SupplierInterface> = ({
   supplierCode: existingSupplierCode,
   supplierName: existingSupplierName,
   supplierTRN: existingSupplierTRN,
+  oxaion: existingOxaion,
   supplierAddress: existingSupplierAddress,
   contactName: existingContactName,
   contactNo: existingContactNo,
@@ -23,6 +24,9 @@ const SupplierForm: React.FC<SupplierInterface> = ({
   const [supplierName, setSupplierName] = useState(existingSupplierName || "");
   const [supplierTRN, setSupplierTRN] = useState<number | null>(
     existingSupplierTRN || null
+  );
+  const [oxaion, setOxaion] = useState<number | null>(
+    existingOxaion || null
   );
   const [supplierAddress, setSupplierAddress] = useState(
     existingSupplierAddress || {
@@ -48,6 +52,7 @@ const SupplierForm: React.FC<SupplierInterface> = ({
     supplierCode: false,
     supplierName: false,
     supplierTRN: false,
+    oxaion: false,
     supplierAddress: {
       address: false,
       POBox: false,
@@ -68,7 +73,6 @@ const SupplierForm: React.FC<SupplierInterface> = ({
 
   async function saveSupplier(e: React.FormEvent) {
     e.preventDefault();
-    console.log("Here");
     const newValidation = { ...validation };
     if (!supplierCode) newValidation.supplierCode = true;
     else newValidation.supplierCode = false;
@@ -76,6 +80,8 @@ const SupplierForm: React.FC<SupplierInterface> = ({
     else newValidation.supplierName = false;
     if (!supplierTRN) newValidation.supplierTRN = true;
     else newValidation.supplierTRN = false;
+    if (!oxaion) newValidation.oxaion = true;
+    else newValidation.oxaion = false;
     if (!supplierAddress.address) newValidation.supplierAddress.address = true;
     else newValidation.supplierAddress.address = false;
     if (!supplierAddress.POBox) newValidation.supplierAddress.POBox = true;
@@ -102,7 +108,6 @@ const SupplierForm: React.FC<SupplierInterface> = ({
     if (!bankDetails.iban) newValidation.bankDetails.iban = true;
     else validation.bankDetails.iban = false;
 
-    console.log(newValidation);
     setValidation(newValidation);
 
     if (
@@ -115,6 +120,7 @@ const SupplierForm: React.FC<SupplierInterface> = ({
         supplierName,
         supplierAddress,
         supplierTRN,
+        oxaion,
         contactName,
         contactNo,
         email,
@@ -128,7 +134,7 @@ const SupplierForm: React.FC<SupplierInterface> = ({
       }
       router.push("/Suppliers");
     } else {
-      alert("Enter missing details!")
+      alert("Enter missing details!");
     }
   }
   return (
@@ -156,15 +162,31 @@ const SupplierForm: React.FC<SupplierInterface> = ({
             />
           </div>
         </div>
-        <div className="flex flex-col">
-          <label>Supplier TRN No.</label>
-          <input
-            type="Number"
-            className={`number-input ${validation.supplierTRN ? "error" : ""}`}
-            placeholder="Supplier TRN Number"
-            value={supplierTRN ?? ""}
-            onChange={(e) => setSupplierTRN(Number(e.target.value))}
-          />
+        <div className="flex gap-2">
+          <div className="flex flex-col">
+            <label>Supplier TRN No.</label>
+            <input
+              type="Number"
+              className={`number-input ${
+                validation.supplierTRN ? "error" : ""
+              }`}
+              placeholder="Supplier TRN Number"
+              value={supplierTRN ?? ""}
+              onChange={(e) => setSupplierTRN(Number(e.target.value))}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label>Oxaion No.</label>
+            <input
+              type="Number"
+              className={`number-input ${
+                validation.supplierTRN ? "error" : ""
+              }`}
+              placeholder="Oxaion Number"
+              value={supplierTRN ?? ""}
+              onChange={(e) => setSupplierTRN(Number(e.target.value))}
+            />
+          </div>
         </div>
         <div>
           <label>Supplier Address</label>

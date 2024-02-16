@@ -4,7 +4,7 @@ import { FaCheck } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { EntityInterface } from "./Interfaces";
+import { EntityInterface, EntityValidationInterface } from "./Interfaces";
 
 const EntityForm: React.FC<EntityInterface> = ({
   _id,
@@ -15,17 +15,55 @@ const EntityForm: React.FC<EntityInterface> = ({
   entityAddress: existingEntityAddress,
 }) => {
   const router = useRouter();
-  const [entityCode, setEntityCode] = useState<number | null>(existingEntityCode || null);
+  const [entityCode, setEntityCode] = useState<number | null>(
+    existingEntityCode || null
+  );
   const [entityAbbrev, setEntityAbbrev] = useState(existingEntityAbbrev || "");
   const [entityName, setEntityName] = useState(existingEntityName || "");
-  const [entityTRN, setEntityTRN] = useState<number | null>(existingEntityTRN || null)
-  const [entityAddress, setEntityAddress] = useState(existingEntityAddress || {
-    address: "",
-    POBox: "",
-    country: "",
+  const [entityTRN, setEntityTRN] = useState<number | null>(
+    existingEntityTRN || null
+  );
+  const [entityAddress, setEntityAddress] = useState(
+    existingEntityAddress || {
+      address: "",
+      POBox: "",
+      country: "",
+    }
+  );
+  const [validation, setValidation] = useState<EntityValidationInterface>({
+    entityCode: false,
+    entityAbbrev: false,
+    entityName: false,
+    entityAddress: { address: false, POBox: false, country: false },
+    entityTRN: false,
   });
+
   async function saveEntity(e: React.FormEvent) {
     e.preventDefault();
+
+    const newValidation = { ...validation };
+    if (!entityCode) newValidation.entityCode = true;
+    else newValidation.entityCode = false;
+    if (!entityAbbrev) newValidation.entityAbbrev = true;
+    else newValidation.entityAbbrev = false;
+    if (!entityName) newValidation.entityName = true;
+    else newValidation.entityName = false;
+    if (!entityTRN) newValidation.entityTRN = true;
+    else newValidation.entityTRN = false;
+    if (!entityAddress.address) newValidation.entityAddress.address = true;
+    else newValidation.entityAddress.address = false;
+    if (!entityAddress.POBox) newValidation.entityAddress.POBox = true;
+    else newValidation.entityAddress.POBox = false;
+    if (!entityAddress.country) newValidation.entityAddress.country = true;
+    else newValidation.entityAddress.country = false;
+
+    setValidation(newValidation);
+
+    if (
+      Object.keys(newValidation).every(
+        (key) => !newValidation[key as keyof EntityValidationInterface]
+      )
+    ) {
     const data = {
       entityCode,
       entityAbbrev,
@@ -34,11 +72,14 @@ const EntityForm: React.FC<EntityInterface> = ({
       entityTRN,
     };
     if (_id) {
-      await axios.put('/api/entities', {...data, _id})
+      await axios.put("/api/entities", { ...data, _id });
     } else {
       await axios.post("/api/entities", data);
     }
     router.push("/Entities");
+  } else {
+    alert("Enter missing details!");
+  }
   }
   return (
     <div>
@@ -48,7 +89,7 @@ const EntityForm: React.FC<EntityInterface> = ({
             <label>Entity Code</label>
             <input
               type="Number"
-              className="number-input"
+              className={`number-input ${validation.entityCode ? "error" : ""}`}
               placeholder="Entity Code"
               value={entityCode ?? ""}
               onChange={(e) => setEntityCode(Number(e.target.value))}
@@ -61,6 +102,7 @@ const EntityForm: React.FC<EntityInterface> = ({
               placeholder="Abbrevation"
               value={entityAbbrev}
               onChange={(e) => setEntityAbbrev(e.target.value)}
+              className={validation.entityAbbrev ? "error" : ""}
             />
           </div>
           <div className="projItems flex-grow">
@@ -70,23 +112,27 @@ const EntityForm: React.FC<EntityInterface> = ({
               placeholder="Entity Name"
               value={entityName}
               onChange={(e) => setEntityName(e.target.value)}
+              className={validation.entityName ? "error" : ""}
             />
           </div>
         </div>
         <div className="flex flex-col">
-            <label>Entity TRN No.</label>
-            <input
+          <label>Entity TRN No.</label>
+          <input
             type="Number"
-            className="number-input"
+            className={`number-input ${validation.entityTRN ? "error" : ""}`}
             placeholder="Entity TRN Number"
             value={entityTRN ?? ""}
-            onChange={(e) => setEntityTRN(Number(e.target.value))} />
+            onChange={(e) => setEntityTRN(Number(e.target.value))}
+          />
         </div>
         <div>
           <label>Entity Address</label>
           <div className="flex flex-col gap-2">
             <input
-              className="flex flex-grow"
+              className={`flex flex-grow ${
+                validation.entityAddress.address ? "error" : ""
+              }`}
               type="text"
               placeholder="Address"
               value={entityAddress.address}
@@ -96,7 +142,7 @@ const EntityForm: React.FC<EntityInterface> = ({
             />
             <div className="flex gap-2">
               <input
-                className="max-w-min"
+                className={`max-w-max ${validation.entityAddress.POBox ? "error" : ""}`}
                 type="text"
                 placeholder="PO Box"
                 value={entityAddress.POBox}
@@ -105,7 +151,9 @@ const EntityForm: React.FC<EntityInterface> = ({
                 }
               />
               <input
-                className="w-72"
+                className={`w-72 ${
+                  validation.entityAddress.country ? "error" : ""
+                }`}
                 type="text"
                 placeholder="Emirate/Country"
                 value={entityAddress.country}

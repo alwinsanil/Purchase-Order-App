@@ -14,7 +14,6 @@ const EditPR = ({ params }: { params: { id: string } }) => {
       setPurchaseReqInfo(response.data);
     });
   }, [id]);
-  console.log(purchaseReqInfo);
   return (
     <>
       <h2>Edit details of {purchaseReqInfo?.purchaseReqCode}</h2>
