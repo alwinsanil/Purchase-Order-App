@@ -15,6 +15,7 @@ import {
 import { AiFillPlusSquare } from "react-icons/ai";
 
 interface itemInterface {
+  itemIndex: number;
   fCodeAssembly: string;
   totalAssembledQty: string;
   fCodeAssemblyPart: string;
@@ -219,6 +220,7 @@ const OrderForm: React.FC<OrderInterface> = ({
       _id: "",
       itemList: [
         {
+          itemIndex: 0,
           fCodeAssembly: "",
           totalAssembledQty: "",
           fCodeAssemblyPart: "",
@@ -251,6 +253,7 @@ const OrderForm: React.FC<OrderInterface> = ({
     _id: "",
     itemList: [
       {
+        itemIndex: 0,
         fCodeAssembly: "",
         totalAssembledQty: "",
         fCodeAssemblyPart: "",
@@ -340,7 +343,7 @@ const OrderForm: React.FC<OrderInterface> = ({
   useEffect(() => {
     const searchProject = project?.projectName;
     if (searchProject !== "") {
-      axios.get("/api/pr?project=").then((response) => {
+      axios.get("/api/pr?project=" + searchProject).then((response) => {
         setAllPurchaseReqs(response.data);
       });
     }
@@ -467,6 +470,7 @@ const OrderForm: React.FC<OrderInterface> = ({
         _id: "",
         itemList: [
           {
+            itemIndex: 0,
             fCodeAssembly: "",
             totalAssembledQty: "",
             fCodeAssemblyPart: "",
@@ -520,7 +524,7 @@ const OrderForm: React.FC<OrderInterface> = ({
   function handleSingleCheck(index: number) {
     const item = purchaseReq.itemList[index];
     const isSelected = selectedItems.some(
-      (selectedItem) => selectedItem.description === item.description
+      (selectedItem) => selectedItem.itemIndex === item.itemIndex
     );
 
     if (!isSelected) {
@@ -528,7 +532,7 @@ const OrderForm: React.FC<OrderInterface> = ({
     } else {
       setSelectedItems(
         selectedItems.filter(
-          (selectedItem) => selectedItem.description !== item.description
+          (selectedItem) => selectedItem.itemIndex !== item.itemIndex
         )
       );
     }
@@ -899,8 +903,8 @@ const OrderForm: React.FC<OrderInterface> = ({
                             type="checkbox"
                             checked={selectedItems.some(
                               (item) =>
-                                item.description ===
-                                purchaseReq.itemList[index].description
+                                item.itemIndex ===
+                                purchaseReq.itemList[index].itemIndex
                             )}
                             onChange={() => handleSingleCheck(index)}
                           />

@@ -27,7 +27,7 @@ export async function PUT(req: NextApiRequest) {
 export async function GET(req: NextApiRequest) {
   await mongooseConnect();
   // @ts-ignore
-  const project = req.nextUrl.searchParams.get("eproject") as string;
+  const project = req.nextUrl.searchParams.get("project") as string;
   // @ts-ignore
   const id = req.nextUrl.searchParams.get("id") as string;
   if (id) {

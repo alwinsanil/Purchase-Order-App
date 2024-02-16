@@ -52,6 +52,8 @@ const PRForm: React.FC<PRInterface> = ({
       purchaseReqCount: 0,
     },
   ]);
+  const [itemIndex, setItemIndex] = useState(0);
+
   useEffect(() => {
     if (!!existingItemList) {
       setItemList(existingItemList);
@@ -154,40 +156,39 @@ const PRForm: React.FC<PRInterface> = ({
     newItem[index].totalTons = newTotalTons;
     setItemList(newItem);
   }
-  function addItem() {
-    setItemList((prev) => {
-      return [
-        ...prev,
-        {
-          fCodeAssembly: "",
-          totalAssembledQty: "",
-          fCodeAssemblyPart: "",
-          description: "",
-          material: "",
-          finish: "",
-          remarks: "",
-          alloy: "",
-          totalQty: null,
-          width: null,
-          thickness: null,
-          length: null,
-          volume: null,
-          weight: null,
-          totalKG: null,
-          totalTons: null,
-          unitPrice: 0,
-          totalCost: 0,
-        },
-      ];
-    });
-  }
-  function removeItem(indexToRemove: number) {
-    setItemList((prev) => {
-      return [...prev].filter((_, index) => {
-        return index !== indexToRemove;
-      });
-    });
-  }
+function addItem() {
+  setItemIndex((prevIndex) => prevIndex + 1);
+  setItemList((prev) => [
+    ...prev,
+    {
+      itemIndex: itemIndex,
+      fCodeAssembly: "",
+      totalAssembledQty: "",
+      fCodeAssemblyPart: "",
+      description: "",
+      material: "",
+      finish: "",
+      remarks: "",
+      alloy: "",
+      totalQty: null,
+      width: null,
+      thickness: null,
+      length: null,
+      volume: null,
+      weight: null,
+      totalKG: null,
+      totalTons: null,
+      unitPrice: 0,
+      totalCost: 0,
+    },
+  ]);
+}
+
+function removeItem(indexToRemove: number) {
+  setItemList((prev) =>
+    prev.filter((item) => item.itemIndex !== indexToRemove)
+  );
+}
   function updatePR(value: string | undefined) {
     if (value !== "") {
       const propProject = allProjects.filter((en) => {
@@ -234,19 +235,6 @@ const PRForm: React.FC<PRInterface> = ({
       <form onSubmit={savePR} className="flex flex-col gap-3 mt-3">
         <div className="projItems">
           <label>Project Name</label>
-          {/* <select
-            value={project?._id}
-            disabled={editMode}
-            onChange={(e) => updatePR(e.target.value)}
-          >
-            <option value="">Select Project</option>
-            {!!allProjects?.length &&
-              allProjects.map((project) => (
-                <option key={project._id} value={project._id}>
-                  {project.projectName}
-                </option>
-              ))}
-          </select> */}
           <Select
             isSearchable
             value={
@@ -284,7 +272,7 @@ const PRForm: React.FC<PRInterface> = ({
                     }
                   />
                 </div>
-                <div className="projItems">
+                <div className="projItems min-w-max">
                   <label>Total Assembly Quantity</label>
                   <input
                     className=""
@@ -378,7 +366,7 @@ const PRForm: React.FC<PRInterface> = ({
                         handleVolumeChange(
                           index,
                           (item.width * item.thickness * item.length) /
-                            Math.pow(1000, 3)
+                            Math.pow(1000, 2)
                         );
                         if (item.volume) {
                           handleWeightChange(index, item.volume * 2710);
@@ -402,7 +390,7 @@ const PRForm: React.FC<PRInterface> = ({
                     }}
                   />
                 </div>
-                <div className="projItems w-24">
+                <div className="projItems w-28">
                   <label>Width (mm)</label>
                   <input
                     className="number-input"
@@ -488,7 +476,7 @@ const PRForm: React.FC<PRInterface> = ({
                     }}
                   />
                 </div>
-                <div className="projItems w-24">
+                <div className="projItems w-28">
                   <label>Length (m)</label>
                   <input
                     className="number-input"
@@ -531,7 +519,7 @@ const PRForm: React.FC<PRInterface> = ({
                     }}
                   />
                 </div>
-                <div className="projItems w-32">
+                <div className="projItems w-36">
                   <label>
                     Volume (mm<sup>3</sup>)
                   </label>
@@ -543,7 +531,7 @@ const PRForm: React.FC<PRInterface> = ({
                     value={item.volume?.toFixed(2) ?? ""}
                   />
                 </div>
-                <div className="projItems w-24">
+                <div className="projItems w-28">
                   <label>Weight (Kg)</label>
                   <input
                     className="number-input"
@@ -553,7 +541,7 @@ const PRForm: React.FC<PRInterface> = ({
                     value={item.weight?.toFixed(2) ?? ""}
                   />
                 </div>
-                <div className="projItems w-36">
+                <div className="projItems w-40">
                   <label>Total Weight (Kg)</label>
                   <input
                     className="number-input"
@@ -563,7 +551,7 @@ const PRForm: React.FC<PRInterface> = ({
                     value={item.totalKG?.toFixed(2) ?? ""}
                   />
                 </div>
-                <div className="projItems w-40">
+                <div className="projItems w-44">
                   <label>Total Weight (Tons)</label>
                   <input
                     className="number-input"

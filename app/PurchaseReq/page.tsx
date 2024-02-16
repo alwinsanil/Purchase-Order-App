@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import Select from "react-select";
 
 interface itemInterface {
+  itemIndex: number;
   fCodeAssembly: string;
   totalAssembledQty: string;
   fCodeAssemblyPart: string;

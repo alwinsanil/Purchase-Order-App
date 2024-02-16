@@ -56,6 +56,7 @@ export interface SupplierInterface {
 }
 
 export interface itemInterface {
+  itemIndex: number;
   fCodeAssembly: string;
   totalAssembledQty: string;
   fCodeAssemblyPart: string;
