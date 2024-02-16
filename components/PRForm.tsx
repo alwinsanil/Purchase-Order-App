@@ -1,11 +1,14 @@
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Select from "react-select";
 import { PRInterface, itemInterface } from "./Interfaces";
+import { AiFillPlusSquare } from "react-icons/ai";
+import { BiImport } from "react-icons/bi";
+import { read, utils } from "xlsx";
 
 const PRForm: React.FC<PRInterface> = ({
   _id,
@@ -53,6 +56,8 @@ const PRForm: React.FC<PRInterface> = ({
     },
   ]);
   const [itemIndex, setItemIndex] = useState(0);
+  const [fileContents, setFileContents] = useState<itemInterface[]>([]);
+  const fileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!!existingItemList) {
@@ -69,6 +74,23 @@ const PRForm: React.FC<PRInterface> = ({
       .get("/api/projects")
       .then((response) => setAllProjects(response.data));
   }, []);
+  useEffect(() => {
+    for (const item of fileContents) {
+      if (item.length && item.thickness && item.width && item.totalQty) {
+        item.volume = item.length * item.thickness * item.width / Math.pow(1000, 3);
+        item.weight = item.volume * 2710;
+        item.totalKG = item.weight * item.totalQty;
+        item.totalTons = item.totalKG / 1000;
+        item.totalCost =  0;
+        item.unitPrice = 0;
+      }
+       else {
+        alert("he file has some missing data values. Kindly check if all mandatory data is entered.")
+        break;
+       }
+    }
+    setItemList(fileContents);
+  }, [fileContents]);
 
   function handleFCodeAssemblyChange(index: number, newFCodeAssembly: string) {
     const newItem = [...itemList];
@@ -156,39 +178,39 @@ const PRForm: React.FC<PRInterface> = ({
     newItem[index].totalTons = newTotalTons;
     setItemList(newItem);
   }
-function addItem() {
-  setItemIndex((prevIndex) => prevIndex + 1);
-  setItemList((prev) => [
-    ...prev,
-    {
-      itemIndex: itemIndex,
-      fCodeAssembly: "",
-      totalAssembledQty: "",
-      fCodeAssemblyPart: "",
-      description: "",
-      material: "",
-      finish: "",
-      remarks: "",
-      alloy: "",
-      totalQty: null,
-      width: null,
-      thickness: null,
-      length: null,
-      volume: null,
-      weight: null,
-      totalKG: null,
-      totalTons: null,
-      unitPrice: 0,
-      totalCost: 0,
-    },
-  ]);
-}
+  function addItem() {
+    setItemIndex((prevIndex) => prevIndex + 1);
+    setItemList((prev) => [
+      ...prev,
+      {
+        itemIndex: itemIndex,
+        fCodeAssembly: "",
+        totalAssembledQty: "",
+        fCodeAssemblyPart: "",
+        description: "",
+        material: "",
+        finish: "",
+        remarks: "",
+        alloy: "",
+        totalQty: null,
+        width: null,
+        thickness: null,
+        length: null,
+        volume: null,
+        weight: null,
+        totalKG: null,
+        totalTons: null,
+        unitPrice: 0,
+        totalCost: 0,
+      },
+    ]);
+  }
 
-function removeItem(indexToRemove: number) {
-  setItemList((prev) =>
-    prev.filter((item) => item.itemIndex !== indexToRemove)
-  );
-}
+  function removeItem(indexToRemove: number) {
+    setItemList((prev) =>
+      prev.filter((item) => item.itemIndex !== indexToRemove)
+    );
+  }
   function updatePR(value: string | undefined) {
     if (value !== "") {
       const propProject = allProjects.filter((en) => {
@@ -204,10 +226,30 @@ function removeItem(indexToRemove: number) {
     }
   }
 
+  function handleImportClick() {
+    if (fileInput.current) {
+      fileInput.current.click();
+    }
+  }
+
+  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    if (event.target.files) {
+      const file = event.target.files[0];
+      importFile(file);
+    }
+  }
+  async function importFile(file: File) {
+    const arrayFile = await file.arrayBuffer();
+    const parsedFile = read(arrayFile);
+    const ws = parsedFile.Sheets[parsedFile.SheetNames[0]];
+    const data: itemInterface[] = utils.sheet_to_json<itemInterface>(ws);
+    setFileContents(data);
+  }
+
   async function savePR(e: React.FormEvent) {
     e.preventDefault();
     if (project._id === "") {
-      alert("Entity Cannot be Empty");
+      alert("Project Cannot be Empty");
       return;
     }
     const data = {
@@ -254,9 +296,22 @@ function removeItem(indexToRemove: number) {
           <h2>{project ? `PR Code: ${purchaseReqCode}` : ""}</h2>
         </div>
         <div className="flex flex-col gap-2">
-          <button type="button" className="btn-1" onClick={() => addItem()}>
-            Add New Item
-          </button>
+          <div className="flex gap-3">
+            <button type="button" className="btn-1" onClick={() => addItem()}>
+              <AiFillPlusSquare className="plusIcon" />
+              Add New Item
+            </button>
+            <input
+              type="file"
+              style={{ display: "none" }}
+              ref={fileInput}
+              onChange={handleFileChange}
+            />
+            <button type="button" className="btn-1" onClick={handleImportClick}>
+              <BiImport className="plusIcon" />
+              Import from file
+            </button>
+          </div>
           {!!itemList?.length &&
             itemList.map((item, index) => (
               <div className="flex gap-3" key={index}>

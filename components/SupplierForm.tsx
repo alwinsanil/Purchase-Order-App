@@ -4,7 +4,7 @@ import { FaCheck } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { SupplierInterface } from "./Interfaces";
+import { SupplierInterface, SupplierValidationInterface } from "./Interfaces";
 
 const SupplierForm: React.FC<SupplierInterface> = ({
   _id,
@@ -44,26 +44,92 @@ const SupplierForm: React.FC<SupplierInterface> = ({
       iban: "",
     }
   );
+  const [validation, setValidation] = useState<SupplierValidationInterface>({
+    supplierCode: false,
+    supplierName: false,
+    supplierTRN: false,
+    supplierAddress: {
+      address: false,
+      POBox: false,
+      country: false,
+    },
+    contactName: false,
+    contactNo: false,
+    email: false,
+    paymentTerm: false,
+    bankDetails: {
+      beneficiary: false,
+      bank: false,
+      swiftCode: false,
+      accountNumber: false,
+      iban: false,
+    },
+  });
 
   async function saveSupplier(e: React.FormEvent) {
     e.preventDefault();
-    const data = {
-      supplierCode,
-      supplierName,
-      supplierAddress,
-      supplierTRN,
-      contactName,
-      contactNo,
-      email,
-      paymentTerm,
-      bankDetails,
-    };
-    if (_id) {
-      await axios.put("/api/suppliers", { ...data, _id });
+    console.log("Here");
+    const newValidation = { ...validation };
+    if (!supplierCode) newValidation.supplierCode = true;
+    else newValidation.supplierCode = false;
+    if (!supplierName) newValidation.supplierName = true;
+    else newValidation.supplierName = false;
+    if (!supplierTRN) newValidation.supplierTRN = true;
+    else newValidation.supplierTRN = false;
+    if (!supplierAddress.address) newValidation.supplierAddress.address = true;
+    else newValidation.supplierAddress.address = false;
+    if (!supplierAddress.POBox) newValidation.supplierAddress.POBox = true;
+    else newValidation.supplierAddress.POBox = false;
+    if (!supplierAddress.country) newValidation.supplierAddress.country = true;
+    else newValidation.supplierAddress.country = false;
+    if (!contactName) newValidation.contactName = true;
+    else newValidation.contactName = false;
+    if (!contactNo) newValidation.contactNo = true;
+    else newValidation.contactNo = false;
+    if (!email) newValidation.email = true;
+    else newValidation.email = false;
+    if (!paymentTerm) newValidation.paymentTerm = true;
+    else newValidation.paymentTerm = false;
+    if (!bankDetails.beneficiary) newValidation.bankDetails.beneficiary = true;
+    else newValidation.bankDetails.beneficiary = false;
+    if (!bankDetails.bank) newValidation.bankDetails.bank = true;
+    else newValidation.bankDetails.bank = false;
+    if (!bankDetails.swiftCode) newValidation.bankDetails.swiftCode = true;
+    else newValidation.bankDetails.swiftCode = false;
+    if (!bankDetails.accountNumber)
+      newValidation.bankDetails.accountNumber = true;
+    else newValidation.bankDetails.accountNumber = false;
+    if (!bankDetails.iban) newValidation.bankDetails.iban = true;
+    else validation.bankDetails.iban = false;
+
+    console.log(newValidation);
+    setValidation(newValidation);
+
+    if (
+      Object.keys(newValidation).every(
+        (key) => !newValidation[key as keyof SupplierValidationInterface]
+      )
+    ) {
+      const data = {
+        supplierCode,
+        supplierName,
+        supplierAddress,
+        supplierTRN,
+        contactName,
+        contactNo,
+        email,
+        paymentTerm,
+        bankDetails,
+      };
+      if (_id) {
+        await axios.put("/api/suppliers", { ...data, _id });
+      } else {
+        await axios.post("/api/suppliers", data);
+      }
+      router.push("/Suppliers");
     } else {
-      await axios.post("/api/suppliers", data);
+      alert("Enter missing details!")
     }
-    router.push("/Suppliers");
   }
   return (
     <div>
@@ -76,6 +142,7 @@ const SupplierForm: React.FC<SupplierInterface> = ({
               placeholder="Supplier Code"
               value={supplierCode}
               onChange={(e) => setSupplierCode(e.target.value)}
+              className={validation.supplierCode ? "error" : ""}
             />
           </div>
           <div className="projItems flex-grow">
@@ -85,6 +152,7 @@ const SupplierForm: React.FC<SupplierInterface> = ({
               placeholder="Supplier Name"
               value={supplierName}
               onChange={(e) => setSupplierName(e.target.value)}
+              className={validation.supplierName ? "error" : ""}
             />
           </div>
         </div>
@@ -92,7 +160,7 @@ const SupplierForm: React.FC<SupplierInterface> = ({
           <label>Supplier TRN No.</label>
           <input
             type="Number"
-            className="number-input"
+            className={`number-input ${validation.supplierTRN ? "error" : ""}`}
             placeholder="Supplier TRN Number"
             value={supplierTRN ?? ""}
             onChange={(e) => setSupplierTRN(Number(e.target.value))}
@@ -102,7 +170,9 @@ const SupplierForm: React.FC<SupplierInterface> = ({
           <label>Supplier Address</label>
           <div className="flex flex-col gap-2">
             <input
-              className="flex flex-grow"
+              className={`flex flex-grow ${
+                validation.supplierAddress.address ? "error" : ""
+              }`}
               type="text"
               placeholder="Address"
               value={supplierAddress.address}
@@ -115,7 +185,9 @@ const SupplierForm: React.FC<SupplierInterface> = ({
             />
             <div className="flex gap-2">
               <input
-                className="max-w-min"
+                className={`max-w-min ${
+                  validation.supplierAddress.POBox ? "error" : ""
+                }`}
                 type="text"
                 placeholder="PO Box"
                 value={supplierAddress.POBox}
@@ -127,7 +199,9 @@ const SupplierForm: React.FC<SupplierInterface> = ({
                 }
               />
               <input
-                className="w-72"
+                className={`w-72 ${
+                  validation.supplierAddress.country ? "error" : ""
+                }`}
                 type="text"
                 placeholder="Emirate/Country"
                 value={supplierAddress.country}
@@ -149,6 +223,7 @@ const SupplierForm: React.FC<SupplierInterface> = ({
               placeholder="Supplier Contact Name"
               value={contactName}
               onChange={(e) => setContactName(e.target.value)}
+              className={validation.contactName ? "error" : ""}
             />
           </div>
           <div className="projItems">
@@ -158,6 +233,7 @@ const SupplierForm: React.FC<SupplierInterface> = ({
               placeholder="Contact No"
               value={contactNo}
               onChange={(e) => setContactNo(e.target.value)}
+              className={validation.contactNo ? "error" : ""}
             />
           </div>
           <div className="projItems w-80">
@@ -167,6 +243,7 @@ const SupplierForm: React.FC<SupplierInterface> = ({
               placeholder="Contact Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className={validation.email ? "error" : ""}
             />
           </div>
         </div>
@@ -177,6 +254,7 @@ const SupplierForm: React.FC<SupplierInterface> = ({
             placeholder="Payment Term"
             value={paymentTerm}
             onChange={(e) => setPaymentTerm(e.target.value)}
+            className={validation.paymentTerm ? "error" : ""}
           />
         </div>
         <div className="projItems gap-3">
@@ -195,6 +273,7 @@ const SupplierForm: React.FC<SupplierInterface> = ({
                   beneficiary: e.target.value,
                 })
               }
+              className={validation.bankDetails.beneficiary ? "error" : ""}
             />
           </div>
           <div className="flex gap-2">
@@ -210,6 +289,7 @@ const SupplierForm: React.FC<SupplierInterface> = ({
                     bank: e.target.value,
                   })
                 }
+                className={validation.bankDetails.bank ? "error" : ""}
               />
             </div>
             <div className="projItems w-full">
@@ -224,6 +304,7 @@ const SupplierForm: React.FC<SupplierInterface> = ({
                     swiftCode: e.target.value,
                   })
                 }
+                className={validation.bankDetails.swiftCode ? "error" : ""}
               />
             </div>
           </div>
@@ -231,7 +312,9 @@ const SupplierForm: React.FC<SupplierInterface> = ({
             <label>Account Number</label>
             <input
               type="Number"
-              className="number-input"
+              className={`number-iput ${
+                validation.bankDetails.accountNumber ? "error" : ""
+              }`}
               placeholder="Account No."
               value={bankDetails.accountNumber}
               onChange={(e) =>
@@ -254,6 +337,7 @@ const SupplierForm: React.FC<SupplierInterface> = ({
                   iban: e.target.value,
                 })
               }
+              className={validation.bankDetails.iban ? "error" : ""}
             />
           </div>
         </div>

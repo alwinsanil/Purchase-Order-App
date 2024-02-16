@@ -76,6 +76,10 @@ label {
   @apply flex flex-col;
 }
 
+.error {
+  @apply border-2 shadow-sm shadow-red-600 border-red-600;
+}
+
 table.primary {
   @apply w-full divide-y divide-gray-200;
 }
@@ -101,7 +105,8 @@ table.primary thead tr th {
   background-color: white;
 }
 
-#grid td, #grid th {
+#grid td,
+#grid th {
   border: 1px solid black;
 }
 
@@ -115,7 +120,7 @@ table.primary thead tr th {
 .my-popup-arrow {
   color: rgb(255, 255, 255);
 }
-[role='tooltip'].my-popup-content {
+[role="tooltip"].my-popup-content {
   width: 200px;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 0px 3px;
 }
@@ -123,6 +128,6 @@ table.primary thead tr th {
 .my-popup-overlay {
   background: rgba(0, 0, 0, 0.5);
 }
-[data-popup='tooltip'].my-popup-overlay {
+[data-popup="tooltip"].my-popup-overlay {
   background: transparent;
 }

@@ -11,6 +11,18 @@ export interface EntityInterface {
   };
 }
 
+export interface EntityValidationInterface {
+  entityCode: boolean;
+  entityAbbrev: boolean;
+  entityName: boolean;
+  entityTRN: boolean;
+  entityAddress: {
+    address: boolean;
+    POBox: boolean;
+    country: boolean;
+  };
+}
+
 export interface ProjectInterface {
   _id: string;
   entity: {
@@ -30,6 +42,16 @@ export interface ProjectInterface {
   contactPerson: string;
   orderCount: number;
   purchaseReqCount: number;
+}
+
+export interface ProjectValidationInterface {
+  entity: {
+    _id: boolean;
+  };
+  abbrev: boolean;
+  projectName: boolean;
+  contractNo: boolean;
+  contactPerson: boolean;
 }
 
 export interface SupplierInterface {
@@ -52,6 +74,28 @@ export interface SupplierInterface {
     swiftCode: string;
     accountNumber: string;
     iban: string;
+  };
+}
+
+export interface SupplierValidationInterface {
+  supplierCode: boolean;
+  supplierName: boolean;
+  supplierTRN: boolean;
+  supplierAddress: {
+    address: boolean;
+    POBox: boolean;
+    country: boolean;
+  };
+  contactName: boolean;
+  contactNo: boolean;
+  email: boolean;
+  paymentTerm: boolean;
+  bankDetails: {
+    beneficiary: boolean;
+    bank: boolean;
+    swiftCode: boolean;
+    accountNumber: boolean;
+    iban: boolean;
   };
 }
 
