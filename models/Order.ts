@@ -9,7 +9,7 @@ const OrderSchema = new Schema({
   purchaseReq: { type: Object, required: true },
   deliveryAddress: { type: Object, required: true },
   orderDate: { type: Date, required: true },
-  deliveryDate: { type: Date, required: true },
+  deliveryDate: { type: Date },
   notes: [{ type: String }],
   deliveryTerms: [{ type: String }],
   totalPrice: { type: Number, required: true },

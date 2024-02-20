@@ -143,11 +143,19 @@ const ProjectForm: React.FC<ProjectInterface> = ({
     else newValidation.contactPerson = false;
 
     setValidation(newValidation);
-
     if (
-      Object.keys(newValidation).every(
-        (key) => !newValidation[key as keyof ProjectValidationInterface]
-      )
+      Object.keys(newValidation).every((key) => {
+        if (
+          typeof newValidation[key as keyof ProjectValidationInterface] ===
+          "object"
+        ) {
+          return Object.values(
+            newValidation[key as keyof ProjectValidationInterface]
+          ).every((val) => !val);
+        } else {
+          return !newValidation[key as keyof ProjectValidationInterface];
+        }
+      })
     ) {
       const data = {
         abbrev,

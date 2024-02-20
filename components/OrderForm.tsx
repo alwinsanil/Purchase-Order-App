@@ -18,7 +18,6 @@ import {
 } from "./Interfaces";
 import { AiFillPlusSquare } from "react-icons/ai";
 
-
 const OrderForm: React.FC<OrderInterface> = ({
   _id,
   purchaseOrderNo: existingPurchaseOrderNo,
@@ -63,17 +62,25 @@ const OrderForm: React.FC<OrderInterface> = ({
   //use states
   const [entity, setEntity] = useState<EntityInterface>({} as EntityInterface);
   const [allEntities, setAllEntities] = useState<EntityInterface[]>([]);
-  const [project, setProject] = useState<ProjectInterface>({} as ProjectInterface);
+  const [project, setProject] = useState<ProjectInterface>(
+    {} as ProjectInterface
+  );
   const [allProjects, setAllProjects] = useState<ProjectInterface[]>([]);
-  const [supplier, setSupplier] = useState<SupplierInterface>({} as SupplierInterface);
+  const [supplier, setSupplier] = useState<SupplierInterface>(
+    {} as SupplierInterface
+  );
   const [allSuppliers, setAllSuppliers] = useState<SupplierInterface[]>([]);
   const [allPurchaseReqs, setAllPurchaseReqs] = useState<PRInterface[]>([]);
-  const [purchaseReq, setPurchaseReq] = useState<PRInterface>({} as PRInterface);
+  const [purchaseReq, setPurchaseReq] = useState<PRInterface>(
+    {} as PRInterface
+  );
   const [selectedItems, setSelectedItems] = useState<itemInterface[]>([]);
   const [notes, setNotes] = useState<string[]>([]);
   const [deliveryTerms, setDeliveryTerms] = useState<string[]>([]);
   const [purchaseOrderNo, setPurchaseOrderNo] = useState("");
-  const [deliveryAddress, setDeliveryAddress] = useState<AddressInterface>({} as AddressInterface);
+  const [deliveryAddress, setDeliveryAddress] = useState<AddressInterface>(
+    {} as AddressInterface
+  );
   const [orderDate, setorderDate] = useState<Date | undefined>(new Date());
   const [deliveryDate, setDeliveryDate] = useState<Date | undefined>(
     new Date()
@@ -682,7 +689,6 @@ const OrderForm: React.FC<OrderInterface> = ({
                       onChange={(e) =>
                         setDeliveryDate(new Date(e.target.value))
                       }
-                      required
                     />
                   </h3>
                 </div>

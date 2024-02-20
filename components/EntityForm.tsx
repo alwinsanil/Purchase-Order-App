@@ -60,9 +60,18 @@ const EntityForm: React.FC<EntityInterface> = ({
     setValidation(newValidation);
 
     if (
-      Object.keys(newValidation).every(
-        (key) => !newValidation[key as keyof EntityValidationInterface]
-      )
+      Object.keys(newValidation).every((key) => {
+        if (
+          typeof newValidation[key as keyof EntityValidationInterface] ===
+          "object"
+        ) {
+          return Object.values(
+            newValidation[key as keyof EntityValidationInterface]
+          ).every((val) => !val);
+        } else {
+          return !newValidation[key as keyof EntityValidationInterface];
+        }
+      })
     ) {
     const data = {
       entityCode,

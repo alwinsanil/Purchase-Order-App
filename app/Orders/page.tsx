@@ -10,6 +10,7 @@ import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { IoIosWarning, IoMdEye } from "react-icons/io";
 import Select from "react-select";
 import Popup from "reactjs-popup";
+import { utils, writeFileXLSX } from "xlsx";
 
 const Orders = () => {
   //styling for react-select
@@ -85,10 +86,46 @@ const Orders = () => {
       });
     }
   }
-
-  function deletePR(_id: string, projectid: string) {
-    const count = project.orderCount - 1;
-    axios.put("/api/projects", { orderCount: count, _id: projectid });
+  function exportReport() {
+    if (selectedOrders) {
+      const newExportData: ExportData[] = selectedOrders.map((order, index) => {
+        return {
+          SNo: index + 1,
+          Date: order.orderDate,
+          PO_Reference: order.purchaseOrderNo,
+          Company: order.entity.entityCode,
+          Oxaion_No: order.supplier.oxaion,
+          BudgetPos: "",
+          Supplier_Name: order.supplier.supplierName,
+          Amount_AED_WO_VAT: order.totalPrice,
+          Vat: 0.05 * order.totalPrice,
+          OMR: null,
+          SAR: null,
+          EUR: null,
+          GBP: null,
+          USD: null,
+          BHD: null,
+          Total: order.totalPrice + 0.05 * order.totalPrice,
+          Total_AED: order.totalPrice + 0.05 * order.totalPrice,
+          Delivery_Status: "",
+          Remarks: "",
+        };
+      });
+      const date = new Date();
+      const ws = utils.json_to_sheet(newExportData);
+      const wb = utils.book_new();
+      utils.book_append_sheet(wb, ws, "Data");
+      writeFileXLSX(
+        wb,
+        "PO_Report_" +
+          (date.getMonth() + 1).toString().padStart(2, "0") +
+          date.getDate().toString().padStart(2, "0") +
+          date.getFullYear() +
+          ".xlsx"
+      );
+    }
+  }
+  function deletePR(_id: string) {
     axios.delete("/api/orders", { data: { _id: _id } }).then((response) => {
       setDeletedId(response.data);
       setSelectedOrders(selectedOrders.filter((pr) => pr._id !== _id));
@@ -128,8 +165,13 @@ const Orders = () => {
               <th>Supplier</th>
               <th>PR No.</th>
               <th>Delivery Date</th>
-              <th>Status</th>
-              <th className="flex justify-center items-center"></th>
+              <th>Price</th>
+              <th className="flex justify-center items-center">
+                <button type="button" className="btn-1" onClick={exportReport}>
+                  <BiExport className="plusIcon" />
+                  Generate Report
+                </button>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -140,21 +182,23 @@ const Orders = () => {
                   <td>{o.supplier.supplierName}</td>
                   <td>{o.purchaseReq.purchaseReqCode}</td>
                   <td>
-                    {o.deliveryDate &&
-                      new Date(o.deliveryDate).toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
+                    {o.deliveryDate
+                      ? new Date(o.deliveryDate).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "TBD"}
                   </td>
                   <td className="max-w-fit text-sm">
-                    <Link
+                    {/* <Link
                       href={"Orders/"}
                       className="flex justify-center items-center gap-1 bg-gray-200 p-2 rounded-md w-24 hover:bg-gray-300"
                     >
                       <IoMdEye size="1.3em" />
                       View
-                    </Link>
+                    </Link> */}
+                    {o.totalPrice.toFixed(2) + " AED"}
                   </td>
                   <td className="flex gap-2 items-center justify-center text-right text-sm font-medium">
                     <Link
@@ -198,7 +242,7 @@ const Orders = () => {
                               <button
                                 className="px-4 py-2 text-white bg-red-700 rounded"
                                 onClick={() => {
-                                  deletePR(o._id, o.project._id);
+                                  deletePR(o._id);
                                   router.push("/Orders");
                                   close();
                                 }}

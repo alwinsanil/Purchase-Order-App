@@ -16,10 +16,10 @@ const ViewPR = ({ params }: { params: { id: string } }) => {
   return (
     <div>
       <h2>Details of {purchaseReqInfo?.purchaseReqCode}</h2>
-      <table className="primary mt-3">
+      <table className="secondary mt-3">
         <thead>
           <tr>
-            <th>Fabrication Code Assebly</th>
+            <th>Fabrication Code Assembly</th>
             <th>Total Assembled Qty</th>
             <th>Fabrication Code Assembly Part</th>
             <th>Description</th>

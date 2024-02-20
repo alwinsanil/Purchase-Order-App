@@ -109,11 +109,19 @@ const SupplierForm: React.FC<SupplierInterface> = ({
     else validation.bankDetails.iban = false;
 
     setValidation(newValidation);
-
     if (
-      Object.keys(newValidation).every(
-        (key) => !newValidation[key as keyof SupplierValidationInterface]
-      )
+      Object.keys(newValidation).every((key) => {
+        if (
+          typeof newValidation[key as keyof SupplierValidationInterface] ===
+          "object"
+        ) {
+          return Object.values(
+            newValidation[key as keyof SupplierValidationInterface]
+          ).every((val) => !val);
+        } else {
+          return !newValidation[key as keyof SupplierValidationInterface];
+        }
+      })
     ) {
       const data = {
         supplierCode,
@@ -180,11 +188,11 @@ const SupplierForm: React.FC<SupplierInterface> = ({
             <input
               type="Number"
               className={`number-input ${
-                validation.supplierTRN ? "error" : ""
+                validation.oxaion ? "error" : ""
               }`}
               placeholder="Oxaion Number"
-              value={supplierTRN ?? ""}
-              onChange={(e) => setSupplierTRN(Number(e.target.value))}
+              value={oxaion ?? ""}
+              onChange={(e) => setOxaion(Number(e.target.value))}
             />
           </div>
         </div>
