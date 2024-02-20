@@ -6,6 +6,7 @@ import "../lib/ARIAL-bold";
 import "../lib/ARIAL-italic";
 import "../lib/ARIAL-bolditalic";
 import {
+  AddressInterface,
   EntityInterface,
   ProjectInterface,
   SupplierInterface,
@@ -18,11 +19,7 @@ export default function GeneratePDF(
   project: ProjectInterface,
   supplier: SupplierInterface,
   selectedItems: itemInterface[],
-  deliveryAddress: {
-    address: string;
-    POBox: string;
-    country: string;
-  },
+  deliveryAddress: AddressInterface,
   orderDate: Date | undefined,
   deliveryDate: Date | undefined,
   notes: string[],

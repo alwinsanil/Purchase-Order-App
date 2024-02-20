@@ -6,7 +6,7 @@ import { AiFillPlusSquare } from "react-icons/ai";
 import { FaCheck } from "react-icons/fa6";
 import { MdCancel } from "react-icons/md";
 import Select from "react-select";
-import { ProjectInterface, ProjectValidationInterface } from "./Interfaces";
+import { AddressInterface, ProjectInterface, ProjectValidationInterface } from "./Interfaces";
 
 const ProjectForm: React.FC<ProjectInterface> = ({
   _id,
@@ -46,9 +46,7 @@ const ProjectForm: React.FC<ProjectInterface> = ({
   const [contractNo, setContractNo] = useState("");
   const purchaseReqCount = 0;
   const orderCount = 0;
-  const [deliveryAddress, setDeliveryAddress] = useState([
-    { address: "", POBox: "", country: "" },
-  ]);
+  const [deliveryAddress, setDeliveryAddress] = useState<AddressInterface[]>([]);
   const [contactPerson, setContactPerson] = useState("");
   const [entity, setEntity] = useState({
     _id: "",

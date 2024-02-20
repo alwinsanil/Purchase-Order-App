@@ -12,6 +12,8 @@ const OrderSchema = new Schema({
   deliveryDate: { type: Date, required: true },
   notes: [{ type: String }],
   deliveryTerms: [{ type: String }],
+  totalPrice: { type: Number, required: true },
+  currency: { type: String },
 });
 
 export const Order = models?.Order || model("Order", OrderSchema);

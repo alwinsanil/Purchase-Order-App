@@ -17,6 +17,7 @@ export async function POST(req: NextApiRequest) {
     deliveryDate,
     notes,
     deliveryTerms,
+    totalPrice,
   } = await(req as any).json();
   const OrderDoc = await Order.create({
     purchaseOrderNo,
@@ -30,6 +31,7 @@ export async function POST(req: NextApiRequest) {
     deliveryDate,
     notes,
     deliveryTerms,
+    totalPrice,
   });
   return NextResponse.json(OrderDoc);
 }
@@ -49,6 +51,7 @@ export async function PUT(req: NextApiRequest) {
     deliveryDate,
     notes,
     deliveryTerms,
+    totalPrice,
   } = await(req as any).json();
   const OrderDoc = await Order.updateOne(
     { _id },
@@ -64,6 +67,7 @@ export async function PUT(req: NextApiRequest) {
       deliveryDate,
       notes,
       deliveryTerms,
+      totalPrice,
     }
   );
   return NextResponse.json(OrderDoc);

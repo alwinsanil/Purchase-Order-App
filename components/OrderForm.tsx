@@ -8,53 +8,16 @@ import Select from "react-select";
 import GeneratePDF from "./GeneratePDF";
 import { FaFilePdf } from "react-icons/fa6";
 import {
+  AddressInterface,
   EntityInterface,
+  OrderInterface,
+  PRInterface,
   ProjectInterface,
   SupplierInterface,
+  itemInterface,
 } from "./Interfaces";
 import { AiFillPlusSquare } from "react-icons/ai";
 
-interface itemInterface {
-  itemIndex: number;
-  fCodeAssembly: string;
-  totalAssembledQty: string;
-  fCodeAssemblyPart: string;
-  description: string;
-  material: string;
-  finish: string;
-  remarks: string;
-  alloy: string;
-  totalQty: number;
-  width: number;
-  thickness: number;
-  length: number;
-  volume: number;
-  weight: number;
-  totalKG: number;
-  totalTons: number;
-  unitPrice: number;
-  totalCost: number;
-}
-
-interface OrderInterface {
-  _id: string;
-  purchaseOrderNo: string;
-  entity: EntityInterface;
-  project: ProjectInterface;
-  supplier: SupplierInterface;
-  selectedItems: itemInterface[];
-  purchaseReq: {
-    _id: string;
-    itemList: itemInterface[];
-    project: { _id: string; projectName: string; purchaseReqCount: number };
-    purchaseReqCode: string;
-  };
-  deliveryAddress: { address: string; POBox: string; country: string };
-  orderDate: Date;
-  deliveryDate: Date | undefined;
-  notes: string[];
-  deliveryTerms: string[];
-}
 
 const OrderForm: React.FC<OrderInterface> = ({
   _id,
@@ -69,6 +32,7 @@ const OrderForm: React.FC<OrderInterface> = ({
   deliveryDate: existingDeliveryDate,
   notes: existingNotes,
   deliveryTerms: existingDeliveryTerms,
+  totalPrice: existingTotalPrice,
 }) => {
   const router = useRouter();
 
@@ -97,208 +61,27 @@ const OrderForm: React.FC<OrderInterface> = ({
   };
 
   //use states
-  const [entity, setEntity] = useState({
-    _id: "",
-    entityCode: 0,
-    entityName: "",
-    entityTRN: 0,
-    entityAbbrev: "",
-    entityAddress: {
-      address: "",
-      POBox: "",
-      country: "",
-    },
-  });
-  const [allEntities, setAllEntities] = useState([
-    {
-      _id: "",
-      entityName: "",
-      entityCode: 0,
-      entityTRN: 0,
-      entityAbbrev: "",
-      entityAddress: {
-        address: "",
-        POBox: "",
-        country: "",
-      },
-    },
-  ]);
-  const [project, setProject] = useState({
-    _id: "",
-    projectName: "",
-    entity: {
-      _id: "",
-      entityName: "",
-      entityCode: 0,
-      entityAbbrev: "",
-    },
-    abbrev: "",
-    contactPerson: "",
-    contractNo: "",
-    deliveryAddress: [
-      {
-        address: "",
-        POBox: "",
-        country: "",
-      },
-    ],
-    orderCount: 0,
-    purchaseReqCount: 0,
-  });
-  const [allProjects, setAllProjects] = useState([
-    {
-      _id: "",
-      projectName: "",
-      entity: {
-        _id: "",
-        entityName: "",
-        entityCode: 0,
-        entityAbbrev: "",
-      },
-      abbrev: "",
-      contactPerson: "",
-      contractNo: "",
-      deliveryAddress: [
-        {
-          address: "",
-          POBox: "",
-          country: "",
-        },
-      ],
-      orderCount: 0,
-      purchaseReqCount: 0,
-    },
-  ]);
-  const [supplier, setSupplier] = useState({
-    _id: "",
-    supplierName: "",
-    supplierTRN: 0,
-    oxaion: 0,
-    supplierCode: "",
-    supplierAddress: {
-      address: "",
-      POBox: "",
-      country: "",
-    },
-    contactName: "",
-    contactNo: "",
-    email: "",
-    paymentTerm: "",
-    bankDetails: {
-      beneficiary: "",
-      bank: "",
-      swiftCode: "",
-      accountNumber: "",
-      iban: "",
-    },
-  });
-  const [allSuppliers, setAllSuppliers] = useState([
-    {
-      _id: "",
-      supplierName: "",
-      supplierTRN: 0,
-      oxaion: 0,
-      supplierCode: "",
-      supplierAddress: {
-        address: "",
-        POBox: "",
-        country: "",
-      },
-      contactName: "",
-      contactNo: "",
-      email: "",
-      paymentTerm: "",
-      bankDetails: {
-        beneficiary: "",
-        bank: "",
-        swiftCode: "",
-        accountNumber: "",
-        iban: "",
-      },
-    },
-  ]);
-  const [allPurchaseReqs, setAllPurchaseReqs] = useState([
-    {
-      _id: "",
-      itemList: [
-        {
-          itemIndex: 0,
-          fCodeAssembly: "",
-          totalAssembledQty: "",
-          fCodeAssemblyPart: "",
-          description: "",
-          material: "",
-          finish: "",
-          remarks: "",
-          alloy: "",
-          totalQty: 0,
-          width: 0,
-          thickness: 0,
-          length: 0,
-          volume: 0,
-          weight: 0,
-          totalKG: 0,
-          totalTons: 0,
-          unitPrice: 0,
-          totalCost: 0,
-        },
-      ],
-      purchaseReqCode: "",
-      project: {
-        _id: "",
-        projectName: "",
-        purchaseReqCount: 0,
-      },
-    },
-  ]);
-  const [purchaseReq, setPurchaseReq] = useState({
-    _id: "",
-    itemList: [
-      {
-        itemIndex: 0,
-        fCodeAssembly: "",
-        totalAssembledQty: "",
-        fCodeAssemblyPart: "",
-        description: "",
-        material: "",
-        finish: "",
-        remarks: "",
-        alloy: "",
-        totalQty: 0,
-        width: 0,
-        thickness: 0,
-        length: 0,
-        volume: 0,
-        weight: 0,
-        totalKG: 0,
-        totalTons: 0,
-        unitPrice: 0,
-        totalCost: 0,
-      },
-    ],
-    purchaseReqCode: "",
-    project: {
-      _id: "",
-      projectName: "",
-      purchaseReqCount: 0,
-    },
-  });
+  const [entity, setEntity] = useState<EntityInterface>({} as EntityInterface);
+  const [allEntities, setAllEntities] = useState<EntityInterface[]>([]);
+  const [project, setProject] = useState<ProjectInterface>({} as ProjectInterface);
+  const [allProjects, setAllProjects] = useState<ProjectInterface[]>([]);
+  const [supplier, setSupplier] = useState<SupplierInterface>({} as SupplierInterface);
+  const [allSuppliers, setAllSuppliers] = useState<SupplierInterface[]>([]);
+  const [allPurchaseReqs, setAllPurchaseReqs] = useState<PRInterface[]>([]);
+  const [purchaseReq, setPurchaseReq] = useState<PRInterface>({} as PRInterface);
   const [selectedItems, setSelectedItems] = useState<itemInterface[]>([]);
   const [notes, setNotes] = useState<string[]>([]);
   const [deliveryTerms, setDeliveryTerms] = useState<string[]>([]);
   const [purchaseOrderNo, setPurchaseOrderNo] = useState("");
-  const [deliveryAddress, setDeliveryAddress] = useState({
-    address: "",
-    POBox: "",
-    country: "",
-  });
+  const [deliveryAddress, setDeliveryAddress] = useState<AddressInterface>({} as AddressInterface);
   const [orderDate, setorderDate] = useState<Date | undefined>(new Date());
   const [deliveryDate, setDeliveryDate] = useState<Date | undefined>(
     new Date()
   );
+  const [totalPrice, setTotalPrice] = useState(0);
   //checkboxes
   const [selectAll, setSelectAll] = useState(false);
-  const [checkboxes, setCheckboxes] = useState([false, false, false]);
+  const [checkboxes, setCheckboxes] = useState([false]);
 
   //useEffects
   useEffect(() => {
@@ -313,6 +96,7 @@ const OrderForm: React.FC<OrderInterface> = ({
     setorderDate(existingOrderDate);
     setNotes(existingNotes);
     setDeliveryTerms(existingDeliveryTerms);
+    setTotalPrice(existingTotalPrice);
   }, [
     existingDeliveryAddress,
     existingDeliveryDate,
@@ -325,6 +109,7 @@ const OrderForm: React.FC<OrderInterface> = ({
     existingPurchaseReq,
     existingSelectedItems,
     existingSupplier,
+    existingTotalPrice,
   ]);
   useEffect(() => {
     axios.get("/api/entities").then((response) => {
@@ -505,23 +290,51 @@ const OrderForm: React.FC<OrderInterface> = ({
   }
   function handleUnitPriceChange(index: number, up: number | null) {
     const updatedPurchaseReq = { ...purchaseReq };
-    if (up !== null) {
-      updatedPurchaseReq.itemList[index].unitPrice = up;
-      updatedPurchaseReq.itemList[index].totalCost =
-        up * updatedPurchaseReq.itemList[index].totalQty;
-    } else {
-      updatedPurchaseReq.itemList[index].unitPrice = 0;
-      updatedPurchaseReq.itemList[index].totalCost = 0;
+    var totalPrice = 0;
+    if (
+      updatedPurchaseReq &&
+      updatedPurchaseReq.itemList &&
+      updatedPurchaseReq.itemList[index]
+    ) {
+      if (up !== null) {
+        updatedPurchaseReq.itemList[index].unitPrice = up;
+        if (updatedPurchaseReq.itemList[index].totalQty !== null) {
+          updatedPurchaseReq.itemList[index].totalCost =
+            //@ts-expect-error
+            up * updatedPurchaseReq.itemList[index].totalQty;
+        }
+      } else {
+        updatedPurchaseReq.itemList[index].unitPrice = 0;
+        updatedPurchaseReq.itemList[index].totalCost = 0;
+      }
+      updatedPurchaseReq.itemList.forEach((item) => {
+        const isSelected = selectedItems.some((selectedItem) => {
+          return selectedItem.itemIndex === item.itemIndex;
+        });
+        if (item.unitPrice && isSelected) {
+          totalPrice += item.totalCost;
+        }
+      });
+      setPurchaseReq(updatedPurchaseReq);
+      setTotalPrice(totalPrice);
     }
-    setPurchaseReq(updatedPurchaseReq);
   }
+
   function handleSelectAll() {
     setSelectAll(!selectAll);
     setCheckboxes(checkboxes.map(() => !selectAll));
     if (!selectAll) {
       setSelectedItems([...purchaseReq.itemList]);
+      var totalPrice = 0;
+      purchaseReq.itemList.forEach((item) => {
+        if (item.unitPrice) {
+          totalPrice += item.totalCost;
+        }
+      });
+      setTotalPrice(totalPrice);
     } else {
       setSelectedItems([]);
+      setTotalPrice(0);
     }
   }
   function handleSingleCheck(index: number) {
@@ -529,16 +342,30 @@ const OrderForm: React.FC<OrderInterface> = ({
     const isSelected = selectedItems.some(
       (selectedItem) => selectedItem.itemIndex === item.itemIndex
     );
+    const newSelectedItems = [...selectedItems];
 
     if (!isSelected) {
-      setSelectedItems([...selectedItems, item]);
+      newSelectedItems.push(item);
+      const itemCost = totalPrice + item.totalCost;
+      setSelectedItems(newSelectedItems);
+      setTotalPrice(itemCost);
     } else {
-      setSelectedItems(
-        selectedItems.filter(
-          (selectedItem) => selectedItem.itemIndex !== item.itemIndex
-        )
+      const itemIndex = newSelectedItems.findIndex(
+        (selectedItem) => selectedItem.itemIndex === item.itemIndex
       );
+      if (itemIndex > -1) {
+        newSelectedItems.splice(itemIndex, 1);
+        const itemCost = totalPrice - item.totalCost;
+        setSelectedItems(newSelectedItems);
+        setTotalPrice(itemCost);
+      }
     }
+    const newSelectAll = purchaseReq.itemList.every((item, i) =>
+      newSelectedItems.some(
+        (selectedItem) => selectedItem.itemIndex === item.itemIndex
+      )
+    );
+    setSelectAll(newSelectAll);
   }
   function addNotes() {
     setNotes((prev) => {
@@ -581,6 +408,7 @@ const OrderForm: React.FC<OrderInterface> = ({
       alert("Project Cannot be Empty");
       return;
     }
+    console.log(selectedItems);
     for (const item of selectedItems) {
       if (!item.unitPrice) {
         alert("Enter all the unit prices of selected items.");
@@ -599,6 +427,7 @@ const OrderForm: React.FC<OrderInterface> = ({
       deliveryDate,
       notes,
       deliveryTerms,
+      totalPrice,
     };
 
     const count = Number(project.orderCount) + 1;
@@ -942,6 +771,17 @@ const OrderForm: React.FC<OrderInterface> = ({
                         </td>
                       </tr>
                     ))}
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                      {totalPrice ? totalPrice.toFixed(2) + " AED" : null}
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>

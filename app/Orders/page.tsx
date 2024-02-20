@@ -1,13 +1,14 @@
 "use client";
-import { OrderInterface } from "@/components/Interfaces";
+import { ExportData, OrderInterface } from "@/components/Interfaces";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AiFillPlusSquare } from "react-icons/ai";
+import { BiExport } from "react-icons/bi";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { IoIosWarning, IoMdEye } from "react-icons/io";
-import Select from 'react-select';
+import Select from "react-select";
 import Popup from "reactjs-popup";
 
 const Orders = () => {
@@ -84,6 +85,7 @@ const Orders = () => {
       });
     }
   }
+
   function deletePR(_id: string, projectid: string) {
     const count = project.orderCount - 1;
     axios.put("/api/projects", { orderCount: count, _id: projectid });
@@ -103,18 +105,6 @@ const Orders = () => {
       </Link>
       <div className="projItems mt-3">
         <label>Project Name</label>
-        {/* <select
-          value={project?._id}
-          onChange={(e) => updateOrders(e.target.value)}
-        >
-          <option value="">Select Project</option>
-          {!!allProjects?.length &&
-            allProjects.map((project) => (
-              <option key={project._id} value={project._id}>
-                {project.projectName}
-              </option>
-            ))}
-        </select> */}
         <Select
           isSearchable
           value={
@@ -135,12 +125,11 @@ const Orders = () => {
           <thead>
             <tr>
               <th>Order No.</th>
-              <th>Project</th>
               <th>Supplier</th>
               <th>PR No.</th>
               <th>Delivery Date</th>
-              <th>View</th>
-              <th></th>
+              <th>Status</th>
+              <th className="flex justify-center items-center"></th>
             </tr>
           </thead>
           <tbody>
@@ -148,7 +137,6 @@ const Orders = () => {
               selectedOrders.map((o: OrderInterface) => (
                 <tr className="odd:bg-white even:bg-gray-100" key={o._id}>
                   <td>{o.purchaseOrderNo}</td>
-                  <td>{o.project.projectName}</td>
                   <td>{o.supplier.supplierName}</td>
                   <td>{o.purchaseReq.purchaseReqCode}</td>
                   <td>

@@ -61,7 +61,29 @@ const NewOrder = () => {
         }}
         purchaseReq={{
           _id: "",
-          itemList: [],
+          itemList: [
+            {
+              itemIndex: 0,
+              fCodeAssembly: "",
+              totalAssembledQty: "",
+              fCodeAssemblyPart: "",
+              description: "",
+              material: "",
+              finish: "",
+              remarks: "",
+              alloy: "",
+              totalQty: null,
+              width: null,
+              thickness: null,
+              length: null,
+              volume: null,
+              weight: null,
+              totalKG: null,
+              totalTons: null,
+              unitPrice: 0,
+              totalCost: 0,
+            },
+          ],
           project: {
             _id: "",
             projectName: "",
@@ -78,29 +100,9 @@ const NewOrder = () => {
         deliveryDate={undefined}
         notes={[]}
         deliveryTerms={[]}
-        selectedItems={[
-          {
-            itemIndex: 0,
-            fCodeAssembly: "",
-            totalAssembledQty: "",
-            fCodeAssemblyPart: "",
-            description: "",
-            material: "",
-            finish: "",
-            remarks: "",
-            alloy: "",
-            totalQty: 0,
-            width: 0,
-            thickness: 0,
-            length: 0,
-            volume: 0,
-            weight: 0,
-            totalKG: 0,
-            totalTons: 0,
-            unitPrice: 0,
-            totalCost: 0,
-          },
-        ]}
+        selectedItems={[]}
+        totalPrice={0}
+        currency={""}
       />
     </div>
   );

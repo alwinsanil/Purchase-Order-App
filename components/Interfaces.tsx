@@ -1,14 +1,22 @@
+export interface AddressInterface {
+  address: string;
+    POBox: string;
+    country: string;
+}
+
+export interface AddressValidationInterface {
+  address: boolean;
+    POBox: boolean;
+    country: boolean;
+}
+
 export interface EntityInterface {
   _id: string;
   entityCode: number;
   entityAbbrev: string;
   entityName: string;
   entityTRN: number;
-  entityAddress: {
-    address: string;
-    POBox: string;
-    country: string;
-  };
+  entityAddress: AddressInterface
 }
 
 export interface EntityValidationInterface {
@@ -16,11 +24,7 @@ export interface EntityValidationInterface {
   entityAbbrev: boolean;
   entityName: boolean;
   entityTRN: boolean;
-  entityAddress: {
-    address: boolean;
-    POBox: boolean;
-    country: boolean;
-  };
+  entityAddress: AddressValidationInterface;
 }
 
 export interface ProjectInterface {
@@ -34,11 +38,7 @@ export interface ProjectInterface {
   abbrev: string;
   projectName: string;
   contractNo: string;
-  deliveryAddress: {
-    address: string;
-    POBox: string;
-    country: string;
-  }[];
+  deliveryAddress: AddressInterface[];
   contactPerson: string;
   orderCount: number;
   purchaseReqCount: number;
@@ -60,11 +60,7 @@ export interface SupplierInterface {
   supplierName: string;
   supplierTRN: number;
   oxaion: number;
-  supplierAddress: {
-    address: string;
-    POBox: string;
-    country: string;
-  };
+  supplierAddress: AddressInterface;
   contactName: string;
   contactNo: string;
   email: string;
@@ -83,11 +79,7 @@ export interface SupplierValidationInterface {
   supplierName: boolean;
   supplierTRN: boolean;
   oxaion: boolean;
-  supplierAddress: {
-    address: boolean;
-    POBox: boolean;
-    country: boolean;
-  };
+  supplierAddress: AddressValidationInterface;
   contactName: boolean;
   contactNo: boolean;
   email: boolean;
@@ -136,10 +128,56 @@ export interface OrderInterface {
   entity: EntityInterface;
   project: ProjectInterface;
   supplier: SupplierInterface;
+  selectedItems: itemInterface[];
   purchaseReq: PRInterface;
   deliveryAddress: { address: string; POBox: string; country: string };
   orderDate: Date;
   deliveryDate: Date | undefined;
-  notes: string[],
-  deliveryTerms: string[],
+  notes: string[];
+  deliveryTerms: string[];
+  totalPrice: number;
+  currency: string;
 }
+
+export interface ExportData {
+  SNo: number;
+  Date: Date;
+  PO_Reference: string;
+  Company: number;
+  Oxaion_No: number;
+  BudgetPos: string;
+  Supplier_Name: string;
+  Amount_AED_WO_VAT: number | null;
+  Vat: number | null;
+  OMR: number | null;
+  SAR: number | null;
+  EUR: number | null;
+  GBP: number | null;
+  USD: number | null;
+  BHD: number | null;
+  Total: number;
+  Total_AED: number;
+  Delivery_Status: string;
+  Remarks: string;
+}
+
+export interface ColourOption {
+  readonly value: string;
+  readonly label: string;
+  readonly color: string;
+  readonly isFixed?: boolean;
+  readonly isDisabled?: boolean;
+}
+
+export const colourOptions: readonly ColourOption[] = [
+  { value: "ocean", label: "Ocean", color: "#00B8D9", isFixed: true },
+  { value: "blue", label: "Blue", color: "#0052CC", isFixed: true },
+  { value: "purple", label: "Purple", color: "#5243AA" },
+  { value: "red", label: "Red", color: "#FF5630", isFixed: true },
+  { value: "orange", label: "Orange", color: "#FF8B00" },
+  { value: "yellow", label: "Yellow", color: "#FFC400" },
+  { value: "green", label: "Green", color: "#36B37E" },
+  { value: "forest", label: "Forest", color: "#00875A" },
+  { value: "slate", label: "Slate", color: "#253858" },
+  { value: "silver", label: "Silver", color: "#666666" },
+];
